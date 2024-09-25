@@ -11,7 +11,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectProjectInfoVo">
-        select project_id, project_name, project_description from project_info
+        select project_id, project_name, project_description from openstack_project_info
     </sql>
 
     <select id="selectProjectInfoList" parameterType="ProjectInfo" resultMap="ProjectInfoResult">
@@ -29,7 +29,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
         
     <insert id="insertProjectInfo" parameterType="ProjectInfo">
-        insert into project_info
+        insert into openstack_project_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="projectId != null">project_id,</if>
             <if test="projectName != null">project_name,</if>
@@ -43,7 +43,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </insert>
 
     <update id="updateProjectInfo" parameterType="ProjectInfo">
-        update project_info
+        update openstack_project_info
         <trim prefix="SET" suffixOverrides=",">
             <if test="projectName != null">project_name = #{projectName},</if>
             <if test="projectDescription != null">project_description = #{projectDescription},</if>
@@ -52,11 +52,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deleteProjectInfoById" parameterType="String">
-        delete from project_info where project_id = #{projectId}
+        delete from openstack_project_info where project_id = #{projectId}
     </delete>
 
     <delete id="deleteProjectInfoByIds" parameterType="String">
-        delete from project_info where project_id in 
+        delete from openstack_project_info where project_id in
         <foreach item="projectId" collection="array" open="(" separator="," close=")">
             #{projectId}
         </foreach>
