@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.wms.mapper.WmsWarehouseMaterialMoveMapper">
+    
+    <resultMap type="WmsWarehouseMaterialMove" id="WmsWarehouseMaterialMoveResult">
+        <result property="id"    column="id"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="sourceWarehouseId"    column="source_warehouse_id"    />
+        <result property="sourceRegionId"    column="source_region_id"    />
+        <result property="sourceLocationId"    column="source_location_id"    />
+        <result property="batchNo"    column="batch_no"    />
+        <result property="targetWarehouseId"    column="target_warehouse_id"    />
+        <result property="targetRegionId"    column="target_region_id"    />
+        <result property="targetLocationId"    column="target_location_id"    />
+        <result property="moveQuantity"    column="move_quantity"    />
+        <result property="operateDate"    column="operate_date"    />
+        <result property="operateUser"    column="operate_user"    />
+        <result property="reason"    column="reason"    />
+        <result property="remark"    column="remark"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectWmsWarehouseMaterialMoveVo">
+        SELECT t.id, t.material_id, t.source_warehouse_id, t.source_region_id, t.source_location_id, t.batch_no, t.target_warehouse_id, t.target_region_id, t.target_location_id, t.move_quantity, t.operate_date, t.operate_user, t.reason, t.remark, t.status 
+		FROM wms_warehouse_material_move t
+		LEFT JOIN `wms_material_info` m ON m.`id` = t.`material_id`
+    </sql>
+
+    <select id="selectWmsWarehouseMaterialMoveList" parameterType="WmsWarehouseMaterialMove" resultMap="WmsWarehouseMaterialMoveResult">
+        <include refid="selectWmsWarehouseMaterialMoveVo"/>
+        <where>  
+            <if test="materialId != null "> and t.material_id = #{materialId}</if>
+            <if test="materialName != null "> and m.name like concat('%', #{materialName}, '%')</if>
+            <if test="sourceWarehouseId != null "> and t.source_warehouse_id = #{sourceWarehouseId}</if>
+            <if test="sourceRegionId != null "> and t.source_region_id = #{sourceRegionId}</if>
+            <if test="sourceLocationId != null "> and t.source_location_id = #{sourceLocationId}</if>
+            <if test="batchNo != null  and batchNo != ''"> and t.batch_no = #{batchNo}</if>
+            <if test="targetWarehouseId != null "> and t.target_warehouse_id = #{targetWarehouseId}</if>
+            <if test="targetRegionId != null "> and t.target_region_id = #{targetRegionId}</if>
+            <if test="targetLocationId != null "> and t.target_location_id = #{targetLocationId}</if>
+            <if test="params.beginOperateDate != null and params.beginOperateDate != '' and params.endOperateDate != null and params.endOperateDate != ''"> and operate_date between #{params.beginOperateDate} and #{params.endOperateDate}</if>
+            <if test="operateUser != null  and operateUser != ''"> and t.operate_user = #{operateUser}</if>
+            <if test="status != null  and status != ''"> and t.status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectWmsWarehouseMaterialMoveById" parameterType="Long" resultMap="WmsWarehouseMaterialMoveResult">
+        <include refid="selectWmsWarehouseMaterialMoveVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertWmsWarehouseMaterialMove" parameterType="WmsWarehouseMaterialMove" useGeneratedKeys="true" keyProperty="id">
+        insert into wms_warehouse_material_move
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="materialId != null">material_id,</if>
+            <if test="sourceWarehouseId != null">source_warehouse_id,</if>
+            <if test="sourceRegionId != null">source_region_id,</if>
+            <if test="sourceLocationId != null">source_location_id,</if>
+            <if test="batchNo != null">batch_no,</if>
+            <if test="targetWarehouseId != null">target_warehouse_id,</if>
+            <if test="targetRegionId != null">target_region_id,</if>
+            <if test="targetLocationId != null">target_location_id,</if>
+            <if test="moveQuantity != null">move_quantity,</if>
+            <if test="operateDate != null">operate_date,</if>
+            <if test="operateUser != null">operate_user,</if>
+            <if test="reason != null">reason,</if>
+            <if test="remark != null">remark,</if>
+            <if test="status != null">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="materialId != null">#{materialId},</if>
+            <if test="sourceWarehouseId != null">#{sourceWarehouseId},</if>
+            <if test="sourceRegionId != null">#{sourceRegionId},</if>
+            <if test="sourceLocationId != null">#{sourceLocationId},</if>
+            <if test="batchNo != null">#{batchNo},</if>
+            <if test="targetWarehouseId != null">#{targetWarehouseId},</if>
+            <if test="targetRegionId != null">#{targetRegionId},</if>
+            <if test="targetLocationId != null">#{targetLocationId},</if>
+            <if test="moveQuantity != null">#{moveQuantity},</if>
+            <if test="operateDate != null">#{operateDate},</if>
+            <if test="operateUser != null">#{operateUser},</if>
+            <if test="reason != null">#{reason},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="status != null">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWmsWarehouseMaterialMove" parameterType="WmsWarehouseMaterialMove">
+        update wms_warehouse_material_move
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="materialId != null">material_id = #{materialId},</if>
+            <if test="sourceWarehouseId != null">source_warehouse_id = #{sourceWarehouseId},</if>
+            <if test="sourceRegionId != null">source_region_id = #{sourceRegionId},</if>
+            <if test="sourceLocationId != null">source_location_id = #{sourceLocationId},</if>
+            <if test="batchNo != null">batch_no = #{batchNo},</if>
+            <if test="targetWarehouseId != null">target_warehouse_id = #{targetWarehouseId},</if>
+            <if test="targetRegionId != null">target_region_id = #{targetRegionId},</if>
+            <if test="targetLocationId != null">target_location_id = #{targetLocationId},</if>
+            <if test="moveQuantity != null">move_quantity = #{moveQuantity},</if>
+            <if test="operateDate != null">operate_date = #{operateDate},</if>
+            <if test="operateUser != null">operate_user = #{operateUser},</if>
+            <if test="reason != null">reason = #{reason},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWmsWarehouseMaterialMoveById" parameterType="Long">
+        delete from wms_warehouse_material_move where id = #{id}
+    </delete>
+
+    <delete id="deleteWmsWarehouseMaterialMoveByIds" parameterType="String">
+        delete from wms_warehouse_material_move where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

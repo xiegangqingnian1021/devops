@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.smty.mapper.CmtArticleMapper">
+    
+    <resultMap type="CmtArticle" id="CmtArticleResult">
+        <result property="id"    column="id"    />
+        <result property="category"    column="category"    />
+        <result property="title"    column="title"    />
+        <result property="content"    column="content"    />
+        <result property="cover"    column="cover"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectCmtArticleVo">
+        select id, category, title, content, cover, create_by, create_time from cmt_article
+    </sql>
+
+    <select id="selectCmtArticleList" parameterType="CmtArticle" resultMap="CmtArticleResult">
+        <include refid="selectCmtArticleVo"/>
+        <where>  
+            <if test="category != null  and category != ''"> and category = #{category}</if>
+            <if test="title != null  and title != ''"> and title like concat('%', #{title}, '%')</if>
+            <if test="createBy != null  and createBy != ''"> and create_by = #{createBy}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and create_time between #{params.beginCreateTime} and #{params.endCreateTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectCmtArticleById" parameterType="Long" resultMap="CmtArticleResult">
+        <include refid="selectCmtArticleVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertCmtArticle" parameterType="CmtArticle" useGeneratedKeys="true" keyProperty="id">
+        insert into cmt_article
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="category != null">category,</if>
+            <if test="title != null">title,</if>
+            <if test="content != null">content,</if>
+            <if test="cover != null">cover,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="category != null">#{category},</if>
+            <if test="title != null">#{title},</if>
+            <if test="content != null">#{content},</if>
+            <if test="cover != null">#{cover},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCmtArticle" parameterType="CmtArticle">
+        update cmt_article
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="category != null">category = #{category},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="cover != null">cover = #{cover},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCmtArticleById" parameterType="Long">
+        delete from cmt_article where id = #{id}
+    </delete>
+
+    <delete id="deleteCmtArticleByIds" parameterType="String">
+        delete from cmt_article where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

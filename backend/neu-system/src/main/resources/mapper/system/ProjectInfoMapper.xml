@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.system.mapper.ProjectInfoMapper">
+    
+    <resultMap type="ProjectInfo" id="ProjectInfoResult">
+        <result property="projectId"    column="project_id"    />
+        <result property="projectName"    column="project_name"    />
+        <result property="projectDescription"    column="project_description"    />
+    </resultMap>
+
+    <sql id="selectProjectInfoVo">
+        select project_id, project_name, project_description from project_info
+    </sql>
+
+    <select id="selectProjectInfoList" parameterType="ProjectInfo" resultMap="ProjectInfoResult">
+        <include refid="selectProjectInfoVo"/>
+        <where>  
+            <if test="projectId != null  and projectId != ''"> and project_id = #{projectId}</if>
+            <if test="projectName != null  and projectName != ''"> and project_name like concat('%', #{projectName}, '%')</if>
+            <if test="projectDescription != null  and projectDescription != ''"> and project_description like concat('%', #{projectDescription}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectProjectInfoById" parameterType="String" resultMap="ProjectInfoResult">
+        <include refid="selectProjectInfoVo"/>
+        where project_id = #{projectId}
+    </select>
+        
+    <insert id="insertProjectInfo" parameterType="ProjectInfo">
+        insert into project_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">project_id,</if>
+            <if test="projectName != null">project_name,</if>
+            <if test="projectDescription != null">project_description,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">#{projectId},</if>
+            <if test="projectName != null">#{projectName},</if>
+            <if test="projectDescription != null">#{projectDescription},</if>
+         </trim>
+    </insert>
+
+    <update id="updateProjectInfo" parameterType="ProjectInfo">
+        update project_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="projectName != null">project_name = #{projectName},</if>
+            <if test="projectDescription != null">project_description = #{projectDescription},</if>
+        </trim>
+        where project_id = #{projectId}
+    </update>
+
+    <delete id="deleteProjectInfoById" parameterType="String">
+        delete from project_info where project_id = #{projectId}
+    </delete>
+
+    <delete id="deleteProjectInfoByIds" parameterType="String">
+        delete from project_info where project_id in 
+        <foreach item="projectId" collection="array" open="(" separator="," close=")">
+            #{projectId}
+        </foreach>
+    </delete>
+</mapper>

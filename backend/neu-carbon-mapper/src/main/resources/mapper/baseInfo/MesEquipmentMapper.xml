@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.mes.mapper.MesEquipmentMapper">
+    
+    <resultMap type="MesEquipment" id="MesEquipmentResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="code"    column="code"    />
+        <result property="model"    column="model"    />
+        <result property="productDate"    column="product_date"    />
+        <result property="batchNo"    column="batch_no"    />
+        <result property="manufacturer"    column="manufacturer"    />
+        <result property="status"    column="status"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectMesEquipmentVo">
+        select id, name, code, model, product_date, batch_no, manufacturer, status, remark, create_by, create_time, update_by, update_time from mes_equipment
+    </sql>
+
+    <select id="selectMesEquipmentList" parameterType="MesEquipment" resultMap="MesEquipmentResult">
+        <include refid="selectMesEquipmentVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="code != null  and code != ''"> and code like concat('%', #{code}, '%')</if>
+            <if test="model != null  and model != ''"> and model like concat('%', #{model}, '%')</if>
+            <if test="params.beginProductDate != null and params.beginProductDate != '' and params.endProductDate != null and params.endProductDate != ''"> and product_date between #{params.beginProductDate} and #{params.endProductDate}</if>
+            <if test="batchNo != null  and batchNo != ''"> and batch_no like concat('%', #{batchNo}, '%')</if>
+            <if test="manufacturer != null  and manufacturer != ''"> and manufacturer like concat('%', #{manufacturer}, '%')</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectMesEquipmentById" parameterType="Long" resultMap="MesEquipmentResult">
+        <include refid="selectMesEquipmentVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertMesEquipment" parameterType="MesEquipment" useGeneratedKeys="true" keyProperty="id">
+        insert into mes_equipment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="code != null">code,</if>
+            <if test="model != null">model,</if>
+            <if test="productDate != null">product_date,</if>
+            <if test="batchNo != null">batch_no,</if>
+            <if test="manufacturer != null">manufacturer,</if>
+            <if test="status != null">status,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="code != null">#{code},</if>
+            <if test="model != null">#{model},</if>
+            <if test="productDate != null">#{productDate},</if>
+            <if test="batchNo != null">#{batchNo},</if>
+            <if test="manufacturer != null">#{manufacturer},</if>
+            <if test="status != null">#{status},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMesEquipment" parameterType="MesEquipment">
+        update mes_equipment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="code != null">code = #{code},</if>
+            <if test="model != null">model = #{model},</if>
+            <if test="productDate != null">product_date = #{productDate},</if>
+            <if test="batchNo != null">batch_no = #{batchNo},</if>
+            <if test="manufacturer != null">manufacturer = #{manufacturer},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMesEquipmentById" parameterType="Long">
+        delete from mes_equipment where id = #{id}
+    </delete>
+
+    <delete id="deleteMesEquipmentByIds" parameterType="String">
+        delete from mes_equipment where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

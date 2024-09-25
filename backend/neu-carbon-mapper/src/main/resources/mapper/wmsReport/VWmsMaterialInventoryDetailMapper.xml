@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.wms.mapper.VWmsMaterialInventoryDetailMapper">
+    
+    <resultMap type="VWmsMaterialInventoryDetail" id="VWmsMaterialInventoryDetailResult">
+        <result property="whId"    column="wh_id"    />
+        <result property="whRegionId"    column="wh_region_id"    />
+        <result property="whLocationId"    column="wh_location_id"    />
+        <result property="inventory"    column="inventory"    />
+        <result property="lockInventory"    column="lock_inventory"    />
+        <result property="batchNo"    column="batch_no"    />
+        <result property="manufacturer"    column="manufacturer"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="maxInventory"    column="max_inventory"    />
+        <result property="minInventory"    column="min_inventory"    />
+        <result property="materialName"    column="material_name"    />
+        <result property="materialModel"    column="material_model"    />
+        <result property="materialSpecification"    column="material_specification"    />
+        <result property="materialUnit"    column="material_unit"    />
+        <result property="whName"    column="wh_name"    />
+        <result property="whRegionName"    column="wh_region_name"    />
+        <result property="whLocationName"    column="wh_location_name"    />
+    </resultMap>
+
+    <sql id="selectVWmsMaterialInventoryDetailVo">
+        SELECT
+		  t.wh_id,
+		  t.wh_region_id,
+		  t.wh_location_id,
+		  SUM(t.inventory) inventory,
+		  SUM(t.lock_inventory) lock_inventory,
+		  t.batch_no,
+		  t.manufacturer,
+		  t.material_id,
+		  t.max_inventory,
+		  t.min_inventory,
+		  t.material_name,
+		  t.material_model,
+		  t.material_specification,
+		  t.material_unit,
+		  t.wh_name,
+		  t.wh_region_name,
+		  t.wh_location_name
+		FROM
+		  v_wms_material_inventory_detail t
+    </sql>
+
+    <select id="selectVWmsMaterialInventoryDetailList" parameterType="VWmsMaterialInventoryDetail" resultMap="VWmsMaterialInventoryDetailResult">
+        <include refid="selectVWmsMaterialInventoryDetailVo"/>
+        <where>  
+            <if test="whId != null "> and wh_id = #{whId}</if>
+            <if test="whRegionId != null "> and wh_region_id = #{whRegionId}</if>
+            <if test="whLocationId != null "> and wh_location_id = #{whLocationId}</if>
+            <if test="batchNo != null  and batchNo != ''"> and batch_no = #{batchNo}</if>
+            <if test="manufacturer != null  and manufacturer != ''"> and manufacturer like concat('%', #{manufacturer}, '%')</if>
+            <if test="materialId != null "> and material_id = #{materialId}</if>
+            <if test="materialName != null  and materialName != ''"> and material_name like concat('%', #{materialName}, '%')</if>
+            <if test="materialModel != null  and materialModel != ''"> and material_model = #{materialModel}</if>
+            <if test="materialSpecification != null  and materialSpecification != ''"> and material_specification = #{materialSpecification}</if>
+        </where>
+        <if test="whId == null and whRegionId == null and whLocationId == null"> GROUP BY t.`material_id`,t.`wh_id` ,t.`wh_region_id`,t.`wh_location_id`</if>
+        <if test="whId != null and whRegionId == null and whLocationId == null"> GROUP BY t.`material_id`,t.`wh_id` </if>
+        <if test="whId != null and whRegionId != null and whLocationId == null"> GROUP BY t.`material_id`,t.`wh_id` ,t.`wh_region_id`</if>
+        <if test="whId != null and whRegionId != null and whLocationId != null"> GROUP BY t.`material_id`,t.`wh_id` ,t.`wh_region_id`,t.`wh_location_id`</if>
+    </select>
+    
+    <select id="selectVWmsMaterialInventoryDetailById" parameterType="Long" resultMap="VWmsMaterialInventoryDetailResult">
+        <include refid="selectVWmsMaterialInventoryDetailVo"/>
+        where wh_id = #{whId}
+    </select>
+</mapper>

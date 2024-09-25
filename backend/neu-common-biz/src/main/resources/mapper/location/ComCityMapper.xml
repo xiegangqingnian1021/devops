@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.smty.mapper.ComCityMapper">
+    
+    <resultMap type="ComCity" id="ComCityResult">
+        <result property="id"    column="id"    />
+        <result property="provinceName"    column="province_name"    />
+        <result property="name"    column="name"    />
+        <result property="letter"    column="letter"    />
+    </resultMap>
+
+    <sql id="selectComCityVo">
+        select id, province_name, name, letter from com_city
+    </sql>
+
+    <select id="selectComCityList" parameterType="ComCity" resultMap="ComCityResult">
+        <include refid="selectComCityVo"/>
+        <where>  
+            <if test="provinceName != null  and provinceName != ''"> and province_name = #{provinceName}</if>
+            <if test="name != null  and name != ''"> and name = #{name}</if>
+            <if test="letter != null  and letter != ''"> and letter = #{letter}</if>
+        </where>
+    </select>
+    
+    <select id="selectComCityById" parameterType="Long" resultMap="ComCityResult">
+        <include refid="selectComCityVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertComCity" parameterType="ComCity" useGeneratedKeys="true" keyProperty="id">
+        insert into com_city
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="provinceName != null and provinceName != ''">province_name,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="letter != null">letter,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="provinceName != null and provinceName != ''">#{provinceName},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="letter != null">#{letter},</if>
+         </trim>
+    </insert>
+
+    <update id="updateComCity" parameterType="ComCity">
+        update com_city
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="provinceName != null and provinceName != ''">province_name = #{provinceName},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="letter != null">letter = #{letter},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteComCityById" parameterType="Long">
+        delete from com_city where id = #{id}
+    </delete>
+
+    <delete id="deleteComCityByIds" parameterType="String">
+        delete from com_city where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

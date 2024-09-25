@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.smty.mapper.CmtArticleCommentMapper">
+    
+    <resultMap type="CmtArticleComment" id="CmtArticleCommentResult">
+        <result property="id"    column="id"    />
+        <result property="articleId"    column="article_id"    />
+        <result property="content"    column="content"    />
+        <result property="goodNum"    column="good_num"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="title"    column="title"    />
+        <result property="realName"    column="real_name"    />
+        <result property="nickName"     column="nick_name"    />
+        <result property="userName"     column="user_name"    />
+        
+    </resultMap>
+
+    <sql id="selectCmtArticleCommentVo">
+        SELECT 
+		t.id, t.article_id, t.content, t.good_num, t.create_by, t.create_time,t.parent_id,
+		a.`title`,
+		u.`user_name`,u.`nick_name`,u.`real_name`,u.`avatar`  
+		FROM cmt_article_comment t
+		LEFT JOIN cmt_article a ON a.`id`=t.`article_id`
+		LEFT JOIN sys_user u ON u.`user_id`=t.`create_by`
+    </sql>
+
+    <select id="selectCmtArticleCommentList" parameterType="CmtArticleComment" resultMap="CmtArticleCommentResult">
+        <include refid="selectCmtArticleCommentVo"/>
+        <where>  
+            <if test="articleId != null "> and t.article_id = #{articleId}</if>
+            <if test="createBy != null  and createBy != ''"> and t.create_by = #{createBy}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and t.create_time between #{params.beginCreateTime} and #{params.endCreateTime}</if>
+            <if test="parentId != null "> and t.parent_id = #{parentId}</if>
+            <if test="title != null and title !=''"> and a.title like concat('%', #{title}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectCmtArticleCommentById" parameterType="Long" resultMap="CmtArticleCommentResult">
+        <include refid="selectCmtArticleCommentVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertCmtArticleComment" parameterType="CmtArticleComment" useGeneratedKeys="true" keyProperty="id">
+        insert into cmt_article_comment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="articleId != null">article_id,</if>
+            <if test="content != null">content,</if>
+            <if test="goodNum != null">good_num,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="parentId != null">parent_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="articleId != null">#{articleId},</if>
+            <if test="content != null">#{content},</if>
+            <if test="goodNum != null">#{goodNum},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="parentId != null">#{parentId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCmtArticleComment" parameterType="CmtArticleComment">
+        update cmt_article_comment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="articleId != null">article_id = #{articleId},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="goodNum != null">good_num = #{goodNum},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCmtArticleCommentById" parameterType="Long">
+        delete from cmt_article_comment where id = #{id}
+    </delete>
+
+    <delete id="deleteCmtArticleCommentByIds" parameterType="String">
+        delete from cmt_article_comment where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

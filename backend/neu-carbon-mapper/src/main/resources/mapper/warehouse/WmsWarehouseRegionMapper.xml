@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.wms.mapper.WmsWarehouseRegionMapper">
+    
+    <resultMap type="WmsWarehouseRegion" id="WmsWarehouseRegionResult">
+        <result property="id"    column="id"    />
+        <result property="warehouseId"    column="warehouse_id"    />
+        <result property="code"    column="code"    />
+        <result property="name"    column="name"    />
+    </resultMap>
+
+    <sql id="selectWmsWarehouseRegionVo">
+        select id, warehouse_id, code, name from wms_warehouse_region
+    </sql>
+
+    <select id="selectWmsWarehouseRegionList" parameterType="WmsWarehouseRegion" resultMap="WmsWarehouseRegionResult">
+        <include refid="selectWmsWarehouseRegionVo"/>
+        <where>  
+            <if test="warehouseId != null "> and warehouse_id = #{warehouseId}</if>
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectWmsWarehouseRegionById" parameterType="Long" resultMap="WmsWarehouseRegionResult">
+        <include refid="selectWmsWarehouseRegionVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWmsWarehouseRegion" parameterType="WmsWarehouseRegion" useGeneratedKeys="true" keyProperty="id">
+        insert into wms_warehouse_region
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="warehouseId != null">warehouse_id,</if>
+            <if test="code != null">code,</if>
+            <if test="name != null">name,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="warehouseId != null">#{warehouseId},</if>
+            <if test="code != null">#{code},</if>
+            <if test="name != null">#{name},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWmsWarehouseRegion" parameterType="WmsWarehouseRegion">
+        update wms_warehouse_region
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="warehouseId != null">warehouse_id = #{warehouseId},</if>
+            <if test="code != null">code = #{code},</if>
+            <if test="name != null">name = #{name},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWmsWarehouseRegionById" parameterType="Long">
+        delete from wms_warehouse_region where id = #{id}
+    </delete>
+
+    <delete id="deleteWmsWarehouseRegionByIds" parameterType="String">
+        delete from wms_warehouse_region where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

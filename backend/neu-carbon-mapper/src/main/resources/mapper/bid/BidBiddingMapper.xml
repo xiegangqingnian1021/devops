@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.bid.mapper.BidBiddingMapper">
+    
+    <resultMap type="BidBidding" id="BidBiddingResult">
+        <result property="id"    column="id"     />
+        <result property="bidTitle"    column="bid_title"    />
+        <result property="bidContent"    column="bid_content"    />
+        <result property="bidPublishDatetime"    column="bid_publish_datetime"    />
+        <result property="bidPublisher"    column="bid_publisher"    />
+        <result property="category"    column="category"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="beginDate"    column="begin_date"    />
+        <result property="endDate"    column="end_date"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectBidBiddingVo">
+        select id, bid_title, bid_content, bid_publish_datetime, bid_publisher, category, create_by, create_time, update_by, update_time, remark, begin_date, end_date, status from bid_bidding
+    </sql>
+
+    <select id="selectBidBiddingList" parameterType="BidBidding" resultMap="BidBiddingResult">
+        <include refid="selectBidBiddingVo"/>
+        <where>
+            <if test="bidTitle != null  and bidTitle != ''">and bid_title = #{bidTitle}</if>
+            <if test="bidContent != null  and bidContent != ''">and bid_content = #{bidContent}</if>
+            <if test="bidPublishDatetime != null ">and bid_publish_datetime = #{bidPublishDatetime}</if>
+            <if test="bidPublisher != null  and bidPublisher != ''">and bid_publisher = #{bidPublisher}</if>
+            <if test="category != null ">and category = #{category}</if>
+            <if test="beginDate != null ">and begin_date = #{beginDate}</if>
+            <if test="endDate != null ">and end_date = #{endDate}</if>
+            <if test="status != null ">and status = #{status}</if>
+            <if test="fromDate != null and toDate != null "> and (bid_publish_datetime &gt;= #{fromDate} and bid_publish_datetime &lt;= #{toDate} )  </if>
+            <if test="enterpriseId != null ">
+                and id not in (select bid_id from bid_enterprise_bidding where enterprise_id = #{enterpriseId} )
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectBidBiddingById" parameterType="Long" resultMap="BidBiddingResult">
+        <include refid="selectBidBiddingVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertBidBidding" parameterType="BidBidding">
+        insert into bid_bidding
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="bidTitle != null and bidTitle != ''">bid_title,</if>
+            <if test="bidContent != null and bidContent != ''">bid_content,</if>
+            <if test="bidPublishDatetime != null">bid_publish_datetime,</if>
+            <if test="bidPublisher != null">bid_publisher,</if>
+            <if test="category != null">category,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="beginDate != null">begin_date,</if>
+            <if test="endDate != null">end_date,</if>
+            <if test="status != null">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="bidTitle != null and bidTitle != ''">#{bidTitle},</if>
+            <if test="bidContent != null and bidContent != ''">#{bidContent},</if>
+            <if test="bidPublishDatetime != null">#{bidPublishDatetime},</if>
+            <if test="bidPublisher != null">#{bidPublisher},</if>
+            <if test="category != null">#{category},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="beginDate != null">#{beginDate},</if>
+            <if test="endDate != null">#{endDate},</if>
+            <if test="status != null">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBidBidding" parameterType="BidBidding">
+        update bid_bidding
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bidTitle != null and bidTitle != ''">bid_title = #{bidTitle},</if>
+            <if test="bidContent != null and bidContent != ''">bid_content = #{bidContent},</if>
+            <if test="bidPublishDatetime != null">bid_publish_datetime = #{bidPublishDatetime},</if>
+            <if test="bidPublisher != null">bid_publisher = #{bidPublisher},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="beginDate != null">begin_date = #{beginDate},</if>
+            <if test="endDate != null">end_date = #{endDate},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBidBiddingById" parameterType="Long">
+        delete from bid_bidding where id = #{id}
+    </delete>
+
+    <delete id="deleteBidBiddingByIds" parameterType="String">
+        delete from bid_bidding where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

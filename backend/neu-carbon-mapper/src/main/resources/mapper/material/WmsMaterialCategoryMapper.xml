@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.wms.mapper.WmsMaterialCategoryMapper">
+    
+    <resultMap type="WmsMaterialCategory" id="WmsMaterialCategoryResult">
+        <result property="id"    column="id"    />
+        <result property="code"    column="code"    />
+        <result property="name"    column="name"    />
+        <result property="remark"    column="remark"    />
+        <result property="parentId"    column="parent_id"    />
+    </resultMap>
+
+    <sql id="selectWmsMaterialCategoryVo">
+        select id, code, name, remark, parent_id from wms_material_category
+    </sql>
+
+    <select id="selectWmsMaterialCategoryList" parameterType="WmsMaterialCategory" resultMap="WmsMaterialCategoryResult">
+        <include refid="selectWmsMaterialCategoryVo"/>
+        <where>  
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
+        </where>
+    </select>
+    
+    <select id="selectWmsMaterialCategoryById" parameterType="Long" resultMap="WmsMaterialCategoryResult">
+        <include refid="selectWmsMaterialCategoryVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWmsMaterialCategory" parameterType="WmsMaterialCategory" useGeneratedKeys="true" keyProperty="id">
+        insert into wms_material_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="code != null">code,</if>
+            <if test="name != null">name,</if>
+            <if test="remark != null">remark,</if>
+            <if test="parentId != null">parent_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="code != null">#{code},</if>
+            <if test="name != null">#{name},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="parentId != null">#{parentId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWmsMaterialCategory" parameterType="WmsMaterialCategory">
+        update wms_material_category
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="code != null">code = #{code},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWmsMaterialCategoryById" parameterType="Long">
+        delete from wms_material_category where id = #{id}
+    </delete>
+
+    <delete id="deleteWmsMaterialCategoryByIds" parameterType="String">
+        delete from wms_material_category where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

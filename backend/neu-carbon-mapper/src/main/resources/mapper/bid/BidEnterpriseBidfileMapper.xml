@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.bid.mapper.BidEnterpriseBidfileMapper">
+    
+    <resultMap type="BidEnterpriseBidfile" id="BidEnterpriseBidfileResult">
+        <result property="id"    column="id"    />
+        <result property="enterpriseBidId"    column="enterprise_bid_id"    />
+        <result property="fileName"    column="file_name"    />
+        <result property="filePath"    column="file_path"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+
+    </resultMap>
+
+    <sql id="selectBidEnterpriseBidfileVo">
+        select id, enterprise_bid_id, file_name, file_path, create_time, update_by, update_time, remark from bid_enterprise_bidfile
+    </sql>
+
+    <select id="selectBidEnterpriseBidfileList" parameterType="BidEnterpriseBidfile" resultMap="BidEnterpriseBidfileResult">
+        <include refid="selectBidEnterpriseBidfileVo"/>
+        <where>  
+            <if test="enterpriseBidId != null "> and enterprise_bid_id = #{enterpriseBidId}</if>
+            <if test="fileName != null  and fileName != ''"> and file_name like concat('%', #{fileName}, '%')</if>
+            <if test="filePath != null  and filePath != ''"> and file_path = #{filePath}</if>
+        </where>
+    </select>
+    
+    <select id="selectBidEnterpriseBidfileById" parameterType="Long" resultMap="BidEnterpriseBidfileResult">
+        <include refid="selectBidEnterpriseBidfileVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertBidEnterpriseBidfile" parameterType="BidEnterpriseBidfile">
+        insert into bid_enterprise_bidfile
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="enterpriseBidId != null">enterprise_bid_id,</if>
+            <if test="fileName != null">file_name,</if>
+            <if test="filePath != null">file_path,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="enterpriseBidId != null">#{enterpriseBidId},</if>
+            <if test="fileName != null">#{fileName},</if>
+            <if test="filePath != null">#{filePath},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBidEnterpriseBidfile" parameterType="BidEnterpriseBidfile">
+        update bid_enterprise_bidfile
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="enterpriseBidId != null">enterprise_bid_id = #{enterpriseBidId},</if>
+            <if test="fileName != null">file_name = #{fileName},</if>
+            <if test="filePath != null">file_path = #{filePath},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBidEnterpriseBidfileById" parameterType="Long">
+        delete from bid_enterprise_bidfile where id = #{id}
+    </delete>
+
+    <delete id="deleteBidEnterpriseBidfileByIds" parameterType="String">
+        delete from bid_enterprise_bidfile where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteBidEnterpriseBidfileByPId" parameterType="Long">
+        delete from bid_enterprise_bidfile where enterprise_bid_id = #{id}
+    </delete>
+
+</mapper>

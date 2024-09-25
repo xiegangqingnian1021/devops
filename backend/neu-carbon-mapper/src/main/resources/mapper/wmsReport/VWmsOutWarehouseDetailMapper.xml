@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.wms.mapper.VWmsOutWarehouseDetailMapper">
+    
+    <resultMap type="VWmsOutWarehouseDetail" id="VWmsOutWarehouseDetailResult">
+        <result property="materialId"    column="material_id"    />
+        <result property="batchNo"    column="batch_no"    />
+        <result property="outQuantity"    column="out_quantity"    />
+        <result property="whId"    column="wh_id"    />
+        <result property="whRegionId"    column="wh_region_id"    />
+        <result property="whLocationId"    column="wh_location_id"    />
+        <result property="bizType"    column="biz_type"    />
+        <result property="inWhDate"    column="in_wh_date"    />
+        <result property="materialName"    column="material_name"    />
+        <result property="materialModel"    column="material_model"    />
+        <result property="materialSpecification"    column="material_specification"    />
+        <result property="materialUnit"    column="material_unit"    />
+        <result property="whName"    column="wh_name"    />
+        <result property="whRegionName"    column="wh_region_name"    />
+        <result property="whLocationName"    column="wh_location_name"    />
+    </resultMap>
+
+    <sql id="selectVWmsOutWarehouseDetailVo">
+        SELECT
+		  t.material_id,
+		  t.batch_no,
+		  SUM(out_quantity) out_quantity,
+		  t.wh_id,
+		  t.wh_region_id,
+		  t.wh_location_id,
+		  t.biz_type,
+		  t.in_wh_date,
+		  t.material_name,
+		  t.material_model,
+		  t.material_specification,
+		  t.material_unit,
+		  t.wh_name,
+		  t.wh_region_name,
+		  t.wh_location_name
+		FROM
+		  v_wms_out_warehouse_detail t
+    </sql>
+
+    <select id="selectVWmsOutWarehouseDetailList" parameterType="VWmsOutWarehouseDetail" resultMap="VWmsOutWarehouseDetailResult">
+        <include refid="selectVWmsOutWarehouseDetailVo"/>
+        <where>  
+            <if test="materialId != null "> and t.material_id = #{materialId}</if>
+            <if test="batchNo != null  and batchNo != ''"> and t.batch_no = #{batchNo}</if>
+            <if test="whId != null "> and t.wh_id = #{whId}</if>
+            <if test="whRegionId != null "> and t.wh_region_id = #{whRegionId}</if>
+            <if test="bizType != null  and bizType != ''"> and t.biz_type = #{bizType}</if>
+            <if test="whLocationId != null "> and t.wh_location_id = #{whLocationId}</if>
+            <if test="params.beginInWhDate != null and params.beginInWhDate != '' and params.endInWhDate != null and params.endInWhDate != ''"> and t.in_wh_date between #{params.beginInWhDate} and #{params.endInWhDate}</if>
+            <if test="materialName != null  and materialName != ''"> and t.material_name like concat('%', #{materialName}, '%')</if>
+            <if test="materialModel != null  and materialModel != ''"> and t.material_model = #{materialModel}</if>
+            <if test="materialSpecification != null  and materialSpecification != ''"> and t.material_specification = #{materialSpecification}</if>
+            <if test="materialUnit != null  and materialUnit != ''"> and t.material_unit = #{materialUnit}</if>
+        </where>
+        GROUP BY t.`material_id`,t.`wh_id`,t.`wh_region_id`,t.`wh_location_id`
+        <if test="bizType != null  and bizType != ''">,t.biz_type</if>
+    </select>
+    
+    <select id="selectVWmsOutWarehouseDetailById" parameterType="Long" resultMap="VWmsOutWarehouseDetailResult">
+        <include refid="selectVWmsOutWarehouseDetailVo"/>
+        where material_id = #{materialId}
+    </select>
+</mapper>

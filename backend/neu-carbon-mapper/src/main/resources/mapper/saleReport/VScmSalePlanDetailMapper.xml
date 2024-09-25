@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.scm.mapper.VScmSalePlanDetailMapper">
+    
+    <resultMap type="VScmSalePlanDetail" id="VScmSalePlanDetailResult">
+        <result property="planNo"    column="plan_no"    />
+        <result property="title"    column="title"    />
+        <result property="type"    column="type"    />
+        <result property="startDate"    column="start_date"    />
+        <result property="endDate"    column="end_date"    />
+        <result property="saleAmount"    column="sale_amount"    />
+        <result property="targetAmount"    column="target_amount"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="materialName"    column="material_name"    />
+    </resultMap>
+
+    <sql id="selectVScmSalePlanDetailVo">
+        select plan_no, title, type, start_date, end_date, sale_amount target_amount, material_id, material_name from v_scm_sale_plan_detail
+    </sql>
+
+    <select id="selectVScmSalePlanDetailList" parameterType="VScmSalePlanDetail" resultMap="VScmSalePlanDetailResult">
+        <include refid="selectVScmSalePlanDetailVo"/>
+        <where>  
+            <if test="planNo != null  and planNo != ''"> and plan_no =like concat('%', #{planNo}, '%')</if>
+            <if test="title != null  and title != ''"> and title like concat('%', #{title}, '%')</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="materialId != null "> and material_id = #{materialId}</if>
+            <if test="materialName != null  and materialName != ''"> and material_name like concat('%', #{materialName}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectAchieveRateByMonth" parameterType="map" resultType="map">
+        SELECT(
+                  SELECT
+                      IFNULL( sum( sale_amount ), 0 ) total
+                  FROM
+                      v_scm_sale_plan_detail vpd
+                  WHERE
+                      type = '3'
+                    AND DATE_FORMAT( vpd.start_date, '%Y-%m' ) =  #{month}) planTotal,
+
+              (SELECT
+                   IFNULL(sum( contract_amount ),0) total
+               FROM
+                   v_scm_sale_contract vsc
+               WHERE
+                   vsc.contract_year_month =  #{month}) contractTotal
+    </select>
+    
+</mapper>

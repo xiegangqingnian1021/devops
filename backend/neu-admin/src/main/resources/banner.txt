@@ -1,0 +1,2 @@
+Application Version: ${carbon.version}
+Spring Boot Version: ${spring-boot.version}

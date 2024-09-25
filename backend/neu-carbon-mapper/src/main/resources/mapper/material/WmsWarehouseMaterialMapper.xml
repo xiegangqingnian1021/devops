@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.wms.mapper.WmsWarehouseMaterialMapper">
+    
+    <resultMap type="WmsWarehouseMaterial" id="WmsWarehouseMaterialResult">
+        <result property="id"    column="id"    />
+        <result property="warehouseId"    column="warehouse_id"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="totalInventory"    column="total_inventory"    />
+        <result property="freezeInventory"    column="freeze_inventory"    />
+        <result property="maxInventory"    column="max_inventory"    />
+        <result property="minInventory"    column="min_inventory"    />
+    </resultMap>
+
+    <resultMap id="WmsWarehouseMaterialWmsWarehouseMaterialDetailResult" type="WmsWarehouseMaterial" extends="WmsWarehouseMaterialResult">
+        <collection property="wmsWarehouseMaterialDetailList" notNullColumn="id" javaType="java.util.List" resultMap="WmsWarehouseMaterialDetailResult" />
+    </resultMap>
+
+    <resultMap type="WmsWarehouseMaterialDetail" id="WmsWarehouseMaterialDetailResult">
+        <result property="id"    column="id"    />
+        <result property="whId"    column="wh_id"    />
+        <result property="whRegionId"    column="wh_region_id"    />
+        <result property="whLocationId"    column="wh_location_id"    />
+        <result property="whMaterialId"    column="wh_material_id"    />
+        <result property="serialNo"    column="serial_no"    />
+        <result property="productDate"    column="product_date"    />
+        <result property="manufacturer"    column="manufacturer"    />
+        <result property="batchNo"    column="batch_no"    />
+        <result property="inventory"    column="inventory"    />
+        <result property="lockInventory"    column="lock_inventory"    />
+        <result property="remark"    column="remark"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateBy"    column="update_by"    />
+    </resultMap>
+
+    <sql id="selectWmsWarehouseMaterialVo">
+        SELECT t.id, t.warehouse_id, t.material_id, t.total_inventory, t.freeze_inventory, t.max_inventory, t.min_inventory,
+			m.`name` material_name 
+		FROM wms_warehouse_material t
+		LEFT JOIN `wms_material_info` m ON m.`id` = t.`material_id`
+    </sql>
+
+    <select id="selectWmsWarehouseMaterialList" parameterType="WmsWarehouseMaterial" resultMap="WmsWarehouseMaterialResult">
+        <include refid="selectWmsWarehouseMaterialVo"/>
+        <where>  
+            <if test="warehouseId != null "> and t.warehouse_id = #{warehouseId}</if>
+            <if test="materialId != null "> and t.material_id = #{materialId}</if>
+            <if test="materialName != null  and materialName != ''"> and m.name like concat('%', #{materialName}, '%')</if>
+            <if test="materialModel != null  and materialModel != ''"> and m.model like concat('%', #{materialModel}, '%')</if>
+            <if test="materialSpecification != null  and materialSpecification != ''"> and m.specification like concat('%', #{materialSpecification}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectWmsWarehouseMaterialById" parameterType="Long" resultMap="WmsWarehouseMaterialWmsWarehouseMaterialDetailResult">
+        select a.id, a.warehouse_id, a.material_id, a.total_inventory, a.freeze_inventory, a.max_inventory, a.min_inventory,
+            b.id, b.wh_id, b.wh_region_id, b.wh_location_id, b.wh_material_id, b.serial_no, b.product_date, b.manufacturer, b.batch_no, b.inventory, b.lock_inventory, b.remark, b.create_time, b.update_time, b.create_by, b.update_by
+        from wms_warehouse_material a
+        left join wms_warehouse_material_detail b on b.wh_material_id = a.id
+        where a.id = #{id}
+    </select>
+        
+    <insert id="insertWmsWarehouseMaterial" parameterType="WmsWarehouseMaterial" useGeneratedKeys="true" keyProperty="id">
+        insert into wms_warehouse_material
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="warehouseId != null">warehouse_id,</if>
+            <if test="materialId != null">material_id,</if>
+            <if test="totalInventory != null">total_inventory,</if>
+            <if test="freezeInventory != null">freeze_inventory,</if>
+            <if test="maxInventory != null">max_inventory,</if>
+            <if test="minInventory != null">min_inventory,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="warehouseId != null">#{warehouseId},</if>
+            <if test="materialId != null">#{materialId},</if>
+            <if test="totalInventory != null">#{totalInventory},</if>
+            <if test="freezeInventory != null">#{freezeInventory},</if>
+            <if test="maxInventory != null">#{maxInventory},</if>
+            <if test="minInventory != null">#{minInventory},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWmsWarehouseMaterial" parameterType="WmsWarehouseMaterial">
+        update wms_warehouse_material
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="warehouseId != null">warehouse_id = #{warehouseId},</if>
+            <if test="materialId != null">material_id = #{materialId},</if>
+            <if test="totalInventory != null">total_inventory = #{totalInventory},</if>
+            <if test="freezeInventory != null">freeze_inventory = #{freezeInventory},</if>
+            <if test="maxInventory != null">max_inventory = #{maxInventory},</if>
+            <if test="minInventory != null">min_inventory = #{minInventory},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWmsWarehouseMaterialById" parameterType="Long">
+        delete from wms_warehouse_material where id = #{id}
+    </delete>
+
+    <delete id="deleteWmsWarehouseMaterialByIds" parameterType="String">
+        delete from wms_warehouse_material where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteWmsWarehouseMaterialDetailByWhMaterialIds" parameterType="String">
+        delete from wms_warehouse_material_detail where wh_material_id in 
+        <foreach item="whMaterialId" collection="array" open="(" separator="," close=")">
+            #{whMaterialId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteWmsWarehouseMaterialDetailByWhMaterialId" parameterType="Long">
+        delete from wms_warehouse_material_detail where wh_material_id = #{whMaterialId}
+    </delete>
+
+    <insert id="batchWmsWarehouseMaterialDetail">
+        insert into wms_warehouse_material_detail( wh_id, wh_region_id, wh_location_id, wh_material_id, serial_no, product_date, manufacturer, batch_no, inventory, remark, lock_inventory, create_time, update_time, create_by, update_by) values
+		<foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.whId}, #{item.whRegionId}, #{item.whLocationId}, #{item.whMaterialId}, #{item.serialNo}, #{item.productDate}, #{item.manufacturer}, #{item.batchNo}, #{item.inventory}, #{item.remark}, #{item.lockInventory}, #{item.createTime}, #{item.updateTime}, #{item.createBy}, #{item.updateBy})
+        </foreach>
+    </insert>
+</mapper>

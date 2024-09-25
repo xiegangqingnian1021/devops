@@ -1,0 +1,24 @@
+**/target/
+**/.DS_Store
+frontend/node_modules/
+frontend/dist/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/**/*.log
+
+frontend/tests/**/coverage/
+frontend/tests/e2e/reports
+frontend/selenium-debug.log
+
+# Editor directories and files
+**/.idea
+**/.vscode
+**/*.suo
+**/*.ntvs*
+**/*.njsproj
+**/*.sln
+**/*.local
+
+frontend/package-lock.json
+frontend/yarn.lock

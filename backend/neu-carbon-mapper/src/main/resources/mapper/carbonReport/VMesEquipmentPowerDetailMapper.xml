@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.footprint.mapper.VMesEquipmentPowerDetailMapper">
+    
+    <resultMap type="VMesEquipmentPowerDetail" id="VMesEquipmentPowerDetailResult">
+        <result property="equipmentId"    column="equipment_id"    />
+        <result property="equipmentName"    column="equipment_name"    />
+        <result property="planId"    column="plan_id"    />
+        <result property="bomId"    column="bom_id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="productDate"    column="product_date"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="requireQuantity"    column="require_quantity"    />
+        <result property="productQuantity"    column="product_quantity"    />
+        <result property="processId"    column="process_id"    />
+        <result property="productLineId"    column="product_line_id"    />
+        <result property="powerConsume"    column="power_consume"    />
+        <result property="processName"    column="process_name"    />
+        <result property="totalPowerConsume"    column="total_power_consume"    />
+        <result property="productLineName"    column="product_line_name"    />
+    </resultMap>
+
+    <sql id="selectVMesEquipmentPowerDetailVo">
+        SELECT
+		  equipment_id,
+		  equipment_name,
+		  plan_id,
+		  bom_id,
+		  order_id,
+		  product_date,
+		  material_id,
+		  SUM(require_quantity) require_quantity,
+		  SUM(product_quantity) product_quantity,
+		  process_id,
+		  product_line_id,
+		  power_consume,
+		  process_name,
+		  SUM(total_power_consume) total_power_consume,
+		  product_line_name
+		FROM
+		  v_mes_equipment_power_detail
+    </sql>
+
+    <select id="selectVMesEquipmentPowerDetailList" parameterType="VMesEquipmentPowerDetail" resultMap="VMesEquipmentPowerDetailResult">
+        SELECT
+		  t.*
+		FROM
+		  (
+        <include refid="selectVMesEquipmentPowerDetailVo"/>
+        <where>  
+            <if test="equipmentId != null "> and equipment_id = #{equipmentId}</if>
+            <if test="equipmentName != null  and equipmentName != ''"> and equipment_name like concat('%', #{equipmentName}, '%')</if>
+            <if test="planId != null "> and plan_id = #{planId}</if>
+            <if test="bomId != null "> and bom_id = #{bomId}</if>
+            <if test="orderId != null "> and order_id = #{orderId}</if>
+            <if test="params.beginProductDate != null and params.beginProductDate != '' and params.endProductDate != null and params.endProductDate != ''"> and product_date between #{params.beginProductDate} and #{params.endProductDate}</if>
+            <if test="materialId != null "> and material_id = #{materialId}</if>
+            <if test="processId != null "> and process_id = #{processId}</if>
+            <if test="productLineId != null "> and product_line_id = #{productLineId}</if>
+            <if test="processName != null  and processName != ''"> and process_name like concat('%', #{processName}, '%')</if>
+            <if test="productLineName != null  and productLineName != ''"> and product_line_name like concat('%', #{productLineName}, '%')</if>
+        </where>
+        GROUP BY equipment_id) t
+  		ORDER BY t.total_power_consume desc
+    </select>
+    
+    <select id="selectEquipmentPowerReportByDay" parameterType="VMesEquipmentPowerDetail" resultMap="VMesEquipmentPowerDetailResult">
+        <include refid="selectVMesEquipmentPowerDetailVo"/>
+        <where>  
+        	product_date IS NOT NULL
+            <if test="equipmentId != null "> and equipment_id = #{equipmentId}</if>
+            <if test="equipmentName != null  and equipmentName != ''"> and equipment_name like concat('%', #{equipmentName}, '%')</if>
+            <if test="planId != null "> and plan_id = #{planId}</if>
+            <if test="bomId != null "> and bom_id = #{bomId}</if>
+            <if test="orderId != null "> and order_id = #{orderId}</if>
+            <if test="productDate != null "> and product_date = #{productDate}</if>
+            <if test="params.beginProductDate != null and params.beginProductDate != '' and params.endProductDate != null and params.endProductDate != ''"> and product_date between #{params.beginProductDate} and #{params.endProductDate}</if>
+            <if test="materialId != null "> and material_id = #{materialId}</if>
+            <if test="processId != null "> and process_id = #{processId}</if>
+            <if test="productLineId != null "> and product_line_id = #{productLineId}</if>
+            <if test="processName != null  and processName != ''"> and process_name like concat('%', #{processName}, '%')</if>
+            <if test="productLineName != null  and productLineName != ''"> and product_line_name like concat('%', #{productLineName}, '%')</if>
+        </where>
+        GROUP BY equipment_id,product_date
+    </select>
+    
+    <select id="selectVMesEquipmentPowerDetailById" parameterType="Long" resultMap="VMesEquipmentPowerDetailResult">
+        <include refid="selectVMesEquipmentPowerDetailVo"/>
+        where equipment_id = #{equipmentId}
+    </select>
+</mapper>

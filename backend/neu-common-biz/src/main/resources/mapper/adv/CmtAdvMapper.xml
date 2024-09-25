@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.smty.mapper.CmtAdvMapper">
+    
+    <resultMap type="CmtAdv" id="CmtAdvResult">
+        <result property="id"    column="id"    />
+        <result property="title"    column="title"    />
+        <result property="image"    column="image"    />
+        <result property="servModule"    column="serv_module"    />
+        <result property="targetId"    column="target_id"    />
+        <result property="sort"    column="sort"    />
+        <result property="type"    column="type"    />
+        <result property="status"    column="status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectCmtAdvVo">
+        select id, title, image, serv_module, target_id, sort, type, status, create_time, update_time from cmt_adv
+    </sql>
+
+    <select id="selectCmtAdvList" parameterType="CmtAdv" resultMap="CmtAdvResult">
+        <include refid="selectCmtAdvVo"/>
+        <where>  
+            <if test="title != null  and title != ''"> and title like concat('%', #{title}, '%')</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectCmtAdvById" parameterType="Long" resultMap="CmtAdvResult">
+        <include refid="selectCmtAdvVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertCmtAdv" parameterType="CmtAdv" useGeneratedKeys="true" keyProperty="id">
+        insert into cmt_adv
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null">title,</if>
+            <if test="image != null">image,</if>
+            <if test="servModule != null">serv_module,</if>
+            <if test="targetId != null">target_id,</if>
+            <if test="sort != null">sort,</if>
+            <if test="type != null">type,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null">#{title},</if>
+            <if test="image != null">#{image},</if>
+            <if test="servModule != null">#{servModule},</if>
+            <if test="targetId != null">#{targetId},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="type != null">#{type},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCmtAdv" parameterType="CmtAdv">
+        update cmt_adv
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null">title = #{title},</if>
+            <if test="image != null">image = #{image},</if>
+            <if test="servModule != null">serv_module = #{servModule},</if>
+            <if test="targetId != null">target_id = #{targetId},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCmtAdvById" parameterType="Long">
+        delete from cmt_adv where id = #{id}
+    </delete>
+
+    <delete id="deleteCmtAdvByIds" parameterType="String">
+        delete from cmt_adv where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

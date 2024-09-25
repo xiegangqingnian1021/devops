@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.bid.mapper.BidEnterpriseMapper">
+    
+    <resultMap type="BidEnterprise" id="BidEnterpriseResult">
+        <result property="id"    column="id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="affiliation"    column="affiliation"    />
+        <result property="password"    column="password"    />
+        <result property="salt"    column="salt"    />
+        <result property="mobile"    column="mobile"    />
+        <result property="name"    column="name"    />
+        <result property="shortName"    column="short_name"    />
+        <result property="addr"    column="addr"    />
+        <result property="bank"    column="bank"    />
+        <result property="account"    column="account"    />
+        <result property="taxNo"    column="tax_no"    />
+        <result property="contact"    column="contact"    />
+        <result property="contactTel"    column="contact_tel"    />
+        <result property="usci"    column="usci"    />
+        <result property="address"    column="address"    />
+        <result property="enterpriseNature"    column="enterprise_nature"    />
+        <result property="doe"    column="doe"    />
+        <result property="corpn"    column="corpn"    />
+        <result property="corpnIdcard"    column="corpn_idcard"    />
+        <result property="contactAddress"    column="contact_address"    />
+        <result property="businessScope"    column="business_scope"    />
+        <result property="profile"    column="profile"    />
+        <result property="businessLicenseImage"    column="business_license_image"    />
+        <result property="businessLicenseGp"    column="business_license_gp"    />
+        <result property="corpnIdcardImage"    column="corpn_idcard_image"    />
+        <result property="registrationPhone"    column="registration_phone"    />
+        <result property="contactAddr"    column="contact_addr"    />
+        <result property="registeredCapital"    column="registered_capital"    />
+        <result property="paidinCapital"    column="paidin_capital"    />
+        <result property="accountLicence"    column="account_licence"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectBidEnterpriseVo">
+        select id, user_name, affiliation, password, salt, mobile, name, short_name, addr, bank, account, tax_no, contact, contact_tel, usci, address, enterprise_nature, doe, corpn, corpn_idcard, contact_address, business_scope, profile, business_license_image, business_license_gp, corpn_idcard_image, registration_phone, contact_addr, registered_capital, paidin_capital, account_licence, create_by, create_time, update_by, update_time, remark from bid_enterprise
+    </sql>
+
+    <select id="selectBidEnterpriseList" parameterType="BidEnterprise" resultMap="BidEnterpriseResult">
+        <include refid="selectBidEnterpriseVo"/>
+        <where>  
+            <if test="userName != null  and userName != ''"> and user_name like concat('%', #{userName}, '%')</if>
+            <if test="affiliation != null  and affiliation != ''"> and affiliation = #{affiliation}</if>
+            <if test="password != null  and password != ''"> and password = #{password}</if>
+            <if test="salt != null  and salt != ''"> and salt = #{salt}</if>
+            <if test="mobile != null  and mobile != ''"> and mobile = #{mobile}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="shortName != null  and shortName != ''"> and short_name like concat('%', #{shortName}, '%')</if>
+            <if test="addr != null  and addr != ''"> and addr = #{addr}</if>
+            <if test="bank != null  and bank != ''"> and bank = #{bank}</if>
+            <if test="account != null  and account != ''"> and account = #{account}</if>
+            <if test="taxNo != null  and taxNo != ''"> and tax_no = #{taxNo}</if>
+            <if test="contact != null  and contact != ''"> and contact = #{contact}</if>
+            <if test="contactTel != null  and contactTel != ''"> and contact_tel = #{contactTel}</if>
+            <if test="usci != null  and usci != ''"> and usci = #{usci}</if>
+            <if test="address != null  and address != ''"> and address = #{address}</if>
+            <if test="enterpriseNature != null  and enterpriseNature != ''"> and enterprise_nature = #{enterpriseNature}</if>
+            <if test="doe != null "> and doe = #{doe}</if>
+            <if test="corpn != null  and corpn != ''"> and corpn = #{corpn}</if>
+            <if test="corpnIdcard != null  and corpnIdcard != ''"> and corpn_idcard = #{corpnIdcard}</if>
+            <if test="contactAddress != null  and contactAddress != ''"> and contact_address = #{contactAddress}</if>
+            <if test="businessScope != null  and businessScope != ''"> and business_scope = #{businessScope}</if>
+            <if test="profile != null  and profile != ''"> and profile = #{profile}</if>
+            <if test="businessLicenseImage != null  and businessLicenseImage != ''"> and business_license_image = #{businessLicenseImage}</if>
+            <if test="businessLicenseGp != null  and businessLicenseGp != ''"> and business_license_gp = #{businessLicenseGp}</if>
+            <if test="corpnIdcardImage != null  and corpnIdcardImage != ''"> and corpn_idcard_image = #{corpnIdcardImage}</if>
+            <if test="registrationPhone != null  and registrationPhone != ''"> and registration_phone = #{registrationPhone}</if>
+            <if test="contactAddr != null  and contactAddr != ''"> and contact_addr = #{contactAddr}</if>
+            <if test="registeredCapital != null  and registeredCapital != ''"> and registered_capital = #{registeredCapital}</if>
+            <if test="paidinCapital != null  and paidinCapital != ''"> and paidin_capital = #{paidinCapital}</if>
+            <if test="accountLicence != null  and accountLicence != ''"> and account_licence = #{accountLicence}</if>
+        </where>
+    </select>
+    
+    <select id="selectBidEnterpriseById" parameterType="Long" resultMap="BidEnterpriseResult">
+        <include refid="selectBidEnterpriseVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectBidEnterpriseListByEnterpriseIds" parameterType="String" resultMap="BidEnterpriseResult">
+        <include refid="selectBidEnterpriseVo"/>
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    <insert id="insertBidEnterprise" parameterType="BidEnterprise">
+        insert into bid_enterprise
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="userName != null and userName != ''">user_name,</if>
+            <if test="affiliation != null">affiliation,</if>
+            <if test="password != null">password,</if>
+            <if test="salt != null">salt,</if>
+            <if test="mobile != null">mobile,</if>
+            <if test="name != null">name,</if>
+            <if test="shortName != null">short_name,</if>
+            <if test="addr != null">addr,</if>
+            <if test="bank != null">bank,</if>
+            <if test="account != null">account,</if>
+            <if test="taxNo != null">tax_no,</if>
+            <if test="contact != null">contact,</if>
+            <if test="contactTel != null">contact_tel,</if>
+            <if test="usci != null">usci,</if>
+            <if test="address != null">address,</if>
+            <if test="enterpriseNature != null">enterprise_nature,</if>
+            <if test="doe != null">doe,</if>
+            <if test="corpn != null">corpn,</if>
+            <if test="corpnIdcard != null">corpn_idcard,</if>
+            <if test="contactAddress != null">contact_address,</if>
+            <if test="businessScope != null">business_scope,</if>
+            <if test="profile != null">profile,</if>
+            <if test="businessLicenseImage != null">business_license_image,</if>
+            <if test="businessLicenseGp != null">business_license_gp,</if>
+            <if test="corpnIdcardImage != null">corpn_idcard_image,</if>
+            <if test="registrationPhone != null">registration_phone,</if>
+            <if test="contactAddr != null">contact_addr,</if>
+            <if test="registeredCapital != null">registered_capital,</if>
+            <if test="paidinCapital != null">paidin_capital,</if>
+            <if test="accountLicence != null">account_licence,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="userName != null and userName != ''">#{userName},</if>
+            <if test="affiliation != null">#{affiliation},</if>
+            <if test="password != null">#{password},</if>
+            <if test="salt != null">#{salt},</if>
+            <if test="mobile != null">#{mobile},</if>
+            <if test="name != null">#{name},</if>
+            <if test="shortName != null">#{shortName},</if>
+            <if test="addr != null">#{addr},</if>
+            <if test="bank != null">#{bank},</if>
+            <if test="account != null">#{account},</if>
+            <if test="taxNo != null">#{taxNo},</if>
+            <if test="contact != null">#{contact},</if>
+            <if test="contactTel != null">#{contactTel},</if>
+            <if test="usci != null">#{usci},</if>
+            <if test="address != null">#{address},</if>
+            <if test="enterpriseNature != null">#{enterpriseNature},</if>
+            <if test="doe != null">#{doe},</if>
+            <if test="corpn != null">#{corpn},</if>
+            <if test="corpnIdcard != null">#{corpnIdcard},</if>
+            <if test="contactAddress != null">#{contactAddress},</if>
+            <if test="businessScope != null">#{businessScope},</if>
+            <if test="profile != null">#{profile},</if>
+            <if test="businessLicenseImage != null">#{businessLicenseImage},</if>
+            <if test="businessLicenseGp != null">#{businessLicenseGp},</if>
+            <if test="corpnIdcardImage != null">#{corpnIdcardImage},</if>
+            <if test="registrationPhone != null">#{registrationPhone},</if>
+            <if test="contactAddr != null">#{contactAddr},</if>
+            <if test="registeredCapital != null">#{registeredCapital},</if>
+            <if test="paidinCapital != null">#{paidinCapital},</if>
+            <if test="accountLicence != null">#{accountLicence},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBidEnterprise" parameterType="BidEnterprise">
+        update bid_enterprise
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userName != null and userName != ''">user_name = #{userName},</if>
+            <if test="affiliation != null">affiliation = #{affiliation},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="salt != null">salt = #{salt},</if>
+            <if test="mobile != null">mobile = #{mobile},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="shortName != null">short_name = #{shortName},</if>
+            <if test="addr != null">addr = #{addr},</if>
+            <if test="bank != null">bank = #{bank},</if>
+            <if test="account != null">account = #{account},</if>
+            <if test="taxNo != null">tax_no = #{taxNo},</if>
+            <if test="contact != null">contact = #{contact},</if>
+            <if test="contactTel != null">contact_tel = #{contactTel},</if>
+            <if test="usci != null">usci = #{usci},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="enterpriseNature != null">enterprise_nature = #{enterpriseNature},</if>
+            <if test="doe != null">doe = #{doe},</if>
+            <if test="corpn != null">corpn = #{corpn},</if>
+            <if test="corpnIdcard != null">corpn_idcard = #{corpnIdcard},</if>
+            <if test="contactAddress != null">contact_address = #{contactAddress},</if>
+            <if test="businessScope != null">business_scope = #{businessScope},</if>
+            <if test="profile != null">profile = #{profile},</if>
+            <if test="businessLicenseImage != null">business_license_image = #{businessLicenseImage},</if>
+            <if test="businessLicenseGp != null">business_license_gp = #{businessLicenseGp},</if>
+            <if test="corpnIdcardImage != null">corpn_idcard_image = #{corpnIdcardImage},</if>
+            <if test="registrationPhone != null">registration_phone = #{registrationPhone},</if>
+            <if test="contactAddr != null">contact_addr = #{contactAddr},</if>
+            <if test="registeredCapital != null">registered_capital = #{registeredCapital},</if>
+            <if test="paidinCapital != null">paidin_capital = #{paidinCapital},</if>
+            <if test="accountLicence != null">account_licence = #{accountLicence},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBidEnterpriseById" parameterType="Long">
+        delete from bid_enterprise where id = #{id}
+    </delete>
+
+    <delete id="deleteBidEnterpriseByIds" parameterType="String">
+        delete from bid_enterprise where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

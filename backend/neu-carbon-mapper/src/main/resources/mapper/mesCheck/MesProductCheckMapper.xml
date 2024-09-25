@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.mes.mapper.MesProductCheckMapper">
+    
+    <resultMap type="MesProductCheck" id="MesProductCheckResult">
+        <result property="id"    column="id"    />
+        <result property="serialNo"    column="serial_no"    />
+        <result property="productFinishId"    column="product_finish_id"    />
+        <result property="productFinishNo"    column="product_finish_no"    />
+        <result property="productPlanId"    column="product_plan_id"    />
+        <result property="productScheduleId"    column="product_schedule_id"    />
+        <result property="productLineId"    column="product_line_id"    />
+        <result property="productJobId"    column="product_job_id"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="materialBatchNo"    column="material_batch_no"    />
+        <result property="productDate"    column="product_date"    />
+        <result property="productQuantity"    column="product_quantity"    />
+        <result property="checkStandardId"    column="check_standard_id"    />
+        <result property="checkQuantity"    column="check_quantity"    />
+        <result property="checkValue"    column="check_value"    />
+        <result property="maxValue"    column="max_value"    />
+        <result property="minValue"    column="min_value"    />
+        <result property="checkResult"    column="check_result"    />
+        <result property="remark"    column="remark"    />
+        <result property="checkUser"    column="check_user"    />
+        <result property="checkDate"    column="check_date"    />
+        <result property="materialName"    column="name"    />
+        <result property="materialCode"    column="code"    />
+        <result property="materialModel"    column="model"    />
+        <result property="materialSpecification"    column="specification"    />
+        <result property="materialUnit"    column="unit"    />
+        <result property="productJobName"    column="product_job_name"    />
+        <result property="productPlanNo"    column="product_plan_no"    />
+        <result property="checkItemName"    column="check_item_name"    />
+        <result property="productLineName"    column="product_line_name"    />
+    </resultMap>
+
+    <sql id="selectMesProductCheckVo">
+        select pc.id, pc.serial_no, pc.product_finish_id, pc.product_finish_no, pc.product_plan_id, pc.product_schedule_id, pc.product_line_id, pc.product_job_id, pc.material_id, pc.material_batch_no, pc.product_date, pc.product_quantity, pc.check_standard_id, pc.check_quantity, pc.check_value, pc.max_value, pc.min_value, pc.check_result, pc.remark, pc.check_user, pc.check_date, m.name, m.code, m.model, m.specification, m.unit, pj.name product_job_name, pp.serial_no product_plan_no, cs.check_item_name, fm.product_line_name
+        from mes_product_check pc left join wms_material_info m on pc.material_id = m.id
+        left join mes_product_job pj on pc.product_job_id = pj.id
+        left join mes_product_plan pp on pc.product_plan_id = pp.id
+        left join mes_check_standard cs on pc.check_standard_id = cs.id
+        left join mes_factory_model fm on pc.product_line_id = fm.id
+    </sql>
+
+    <select id="selectMesProductCheckList" parameterType="MesProductCheck" resultMap="MesProductCheckResult">
+        <include refid="selectMesProductCheckVo"/>
+        <where>
+            <if test="serialNo != null  and serialNo != ''"> and pc.serial_no like concat('%', #{serialNo}, '%')</if>
+            <if test="productFinishId != null "> and pc.product_finish_id = #{productFinishId}</if>
+            <if test="productFinishNo != null  and productFinishNo != ''"> and pc.product_finish_no like concat('%', #{productFinishNo}, '%')</if>
+            <if test="productPlanId != null "> and pc.product_plan_id = #{productPlanId}</if>
+            <if test="productScheduleId != null "> and pc.product_schedule_id = #{productScheduleId}</if>
+            <if test="productLineId != null "> and pc.product_line_id = #{productLineId}</if>
+            <if test="productJobId != null "> and pc.product_job_id = #{productJobId}</if>
+            <if test="materialId != null "> and pc.material_id = #{materialId}</if>
+            <if test="materialBatchNo != null  and materialBatchNo != ''"> and pc.material_batch_no like concat('%', #{materialBatchNo}, '%')</if>
+            <if test="params.beginProductDate != null and params.beginProductDate != '' and params.endProductDate != null and params.endProductDate != ''"> and pc.product_date between #{params.beginProductDate} and #{params.endProductDate}</if>
+            <if test="checkStandardId != null "> and pc.check_standard_id = #{checkStandardId}</if>
+            <if test="checkResult != null  and checkResult != ''"> and pc.check_result = #{checkResult}</if>
+            <if test="checkUser != null  and checkUser != ''"> and pc.check_user = #{checkUser}</if>
+            <if test="params.beginCheckDate != null and params.beginCheckDate != '' and params.endCheckDate != null and params.endCheckDate != ''"> and pc.check_date between #{params.beginCheckDate} and #{params.endCheckDate}</if>
+            <if test="materialName != null  and materialName != ''"> and m.name like concat('%', #{materialName}, '%')</if>
+            <if test="productJobName != null  and productJobName != ''"> and pj.name like concat('%', #{productJobName}, '%')</if>
+            <if test="productPlanNo != null  and productPlanNo != ''"> and pp.serial_no like concat('%', #{productPlanNo}, '%')</if>
+            <if test="checkItemName != null  and checkItemName != ''"> and cs.check_item_name like concat('%', #{checkItemName}, '%')</if>
+            <if test="productLineName != null  and productLineName != ''"> and fm.product_line_name like concat('%', #{productLineName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectMesProductCheckById" parameterType="Long" resultMap="MesProductCheckResult">
+        <include refid="selectMesProductCheckVo"/>
+        where pc.id = #{id}
+    </select>
+        
+    <insert id="insertMesProductCheck" parameterType="MesProductCheck" useGeneratedKeys="true" keyProperty="id">
+        insert into mes_product_check
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="serialNo != null">serial_no,</if>
+            <if test="productFinishId != null">product_finish_id,</if>
+            <if test="productFinishNo != null">product_finish_no,</if>
+            <if test="productPlanId != null">product_plan_id,</if>
+            <if test="productScheduleId != null">product_schedule_id,</if>
+            <if test="productLineId != null">product_line_id,</if>
+            <if test="productJobId != null">product_job_id,</if>
+            <if test="materialId != null">material_id,</if>
+            <if test="materialBatchNo != null and materialBatchNo != ''">material_batch_no,</if>
+            <if test="productDate != null">product_date,</if>
+            <if test="productQuantity != null">product_quantity,</if>
+            <if test="checkStandardId != null">check_standard_id,</if>
+            <if test="checkQuantity != null">check_quantity,</if>
+            <if test="checkValue != null">check_value,</if>
+            <if test="maxValue != null">max_value,</if>
+            <if test="minValue != null">min_value,</if>
+            <if test="checkResult != null">check_result,</if>
+            <if test="remark != null">remark,</if>
+            <if test="checkUser != null">check_user,</if>
+            <if test="checkDate != null">check_date,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="serialNo != null">#{serialNo},</if>
+            <if test="productFinishId != null">#{productFinishId},</if>
+            <if test="productFinishNo != null">#{productFinishNo},</if>
+            <if test="productPlanId != null">#{productPlanId},</if>
+            <if test="productScheduleId != null">#{productScheduleId},</if>
+            <if test="productLineId != null">#{productLineId},</if>
+            <if test="productJobId != null">#{productJobId},</if>
+            <if test="materialId != null">#{materialId},</if>
+            <if test="materialBatchNo != null and materialBatchNo != ''">#{materialBatchNo},</if>
+            <if test="productDate != null">#{productDate},</if>
+            <if test="productQuantity != null">#{productQuantity},</if>
+            <if test="checkStandardId != null">#{checkStandardId},</if>
+            <if test="checkQuantity != null">#{checkQuantity},</if>
+            <if test="checkValue != null">#{checkValue},</if>
+            <if test="maxValue != null">#{maxValue},</if>
+            <if test="minValue != null">#{minValue},</if>
+            <if test="checkResult != null">#{checkResult},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="checkUser != null">#{checkUser},</if>
+            <if test="checkDate != null">#{checkDate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMesProductCheck" parameterType="MesProductCheck">
+        update mes_product_check
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="serialNo != null">serial_no = #{serialNo},</if>
+            <if test="productFinishId != null">product_finish_id = #{productFinishId},</if>
+            <if test="productFinishNo != null">product_finish_no = #{productFinishNo},</if>
+            <if test="productPlanId != null">product_plan_id = #{productPlanId},</if>
+            <if test="productScheduleId != null">product_schedule_id = #{productScheduleId},</if>
+            <if test="productLineId != null">product_line_id = #{productLineId},</if>
+            <if test="productJobId != null">product_job_id = #{productJobId},</if>
+            <if test="materialId != null">material_id = #{materialId},</if>
+            <if test="materialBatchNo != null and materialBatchNo != ''">material_batch_no = #{materialBatchNo},</if>
+            <if test="productDate != null">product_date = #{productDate},</if>
+            <if test="productQuantity != null">product_quantity = #{productQuantity},</if>
+            <if test="checkStandardId != null">check_standard_id = #{checkStandardId},</if>
+            <if test="checkQuantity != null">check_quantity = #{checkQuantity},</if>
+            <if test="checkValue != null">check_value = #{checkValue},</if>
+            <if test="maxValue != null">max_value = #{maxValue},</if>
+            <if test="minValue != null">min_value = #{minValue},</if>
+            <if test="checkResult != null">check_result = #{checkResult},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="checkUser != null">check_user = #{checkUser},</if>
+            <if test="checkDate != null">check_date = #{checkDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMesProductCheckById" parameterType="Long">
+        delete from mes_product_check where id = #{id}
+    </delete>
+
+    <delete id="deleteMesProductCheckByIds" parameterType="String">
+        delete from mes_product_check where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

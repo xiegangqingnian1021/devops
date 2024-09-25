@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.footprint.mapper.TmpEnergyConsumeMapper">
+    
+    <resultMap type="TmpEnergyConsume" id="TmpEnergyConsumeResult">
+        <result property="id"    column="id"    />
+        <result property="type"    column="type"    />
+        <result property="category"    column="category"    />
+        <result property="month"    column="month"    />
+        <result property="day"    column="day"    />
+        <result property="energy"    column="energy"    />
+        <result property="itemCategory"    column="item_category"    />
+        <result property="year"    column="year"    />
+    </resultMap>
+
+    <sql id="selectTmpEnergyConsumeVo">
+        select id, type, category, month, day, energy, item_category, year from tmp_energy_consume
+    </sql>
+
+    <select id="selectTmpEnergyConsumeList" parameterType="TmpEnergyConsume" resultMap="TmpEnergyConsumeResult">
+        <include refid="selectTmpEnergyConsumeVo"/>
+        <where>  
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="category != null  and category != ''"> and category = #{category}</if>
+            <if test="month != null  and month != ''"> and month = #{month}</if>
+            <if test="day != null  and day != ''"> and day = #{day}</if>
+            <if test="itemCategory != null  and itemCategory != ''"> and item_category = #{itemCategory}</if>
+            <if test="year != null  and year != ''"> and year = #{year}</if>
+        </where>
+    </select>
+    
+    <select id="selectTmpEnergyConsumeById" parameterType="Long" resultMap="TmpEnergyConsumeResult">
+        <include refid="selectTmpEnergyConsumeVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTmpEnergyConsume" parameterType="TmpEnergyConsume" useGeneratedKeys="true" keyProperty="id">
+        insert into tmp_energy_consume
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="type != null">type,</if>
+            <if test="category != null">category,</if>
+            <if test="month != null">month,</if>
+            <if test="day != null">day,</if>
+            <if test="energy != null">energy,</if>
+            <if test="itemCategory != null">item_category,</if>
+            <if test="year != null">year,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="type != null">#{type},</if>
+            <if test="category != null">#{category},</if>
+            <if test="month != null">#{month},</if>
+            <if test="day != null">#{day},</if>
+            <if test="energy != null">#{energy},</if>
+            <if test="itemCategory != null">#{itemCategory},</if>
+            <if test="year != null">#{year},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTmpEnergyConsume" parameterType="TmpEnergyConsume">
+        update tmp_energy_consume
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="type != null">type = #{type},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="month != null">month = #{month},</if>
+            <if test="day != null">day = #{day},</if>
+            <if test="energy != null">energy = #{energy},</if>
+            <if test="itemCategory != null">item_category = #{itemCategory},</if>
+            <if test="year != null">year = #{year},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTmpEnergyConsumeById" parameterType="Long">
+        delete from tmp_energy_consume where id = #{id}
+    </delete>
+
+    <delete id="deleteTmpEnergyConsumeByIds" parameterType="String">
+        delete from tmp_energy_consume where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

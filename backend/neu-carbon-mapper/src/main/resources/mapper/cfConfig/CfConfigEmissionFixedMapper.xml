@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.footprint.mapper.CfConfigEmissionFixedMapper">
+    
+    <resultMap type="CfConfigEmissionFixed" id="CfConfigEmissionFixedResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="type"    column="type"    />
+        <result property="category"    column="category"    />
+        <result property="thresholdValue"    column="threshold_value"    />
+        <result property="energy"    column="energy"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectCfConfigEmissionFixedVo">
+        select id, name, type, category, threshold_value, energy, remark from cf_config_emission_fixed
+    </sql>
+
+    <select id="selectCfConfigEmissionFixedList" parameterType="CfConfigEmissionFixed" resultMap="CfConfigEmissionFixedResult">
+        <include refid="selectCfConfigEmissionFixedVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="category != null  and category != ''"> and category = #{category}</if>
+            <if test="thresholdValue != null "> and threshold_value = #{thresholdValue}</if>
+        </where>
+    </select>
+    
+    <select id="selectCfConfigEmissionFixedById" parameterType="Long" resultMap="CfConfigEmissionFixedResult">
+        <include refid="selectCfConfigEmissionFixedVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertCfConfigEmissionFixed" parameterType="CfConfigEmissionFixed">
+        insert into cf_config_emission_fixed
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="type != null">type,</if>
+            <if test="category != null">category,</if>
+            <if test="thresholdValue != null">threshold_value,</if>
+            <if test="energy != null">energy,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="type != null">#{type},</if>
+            <if test="category != null">#{category},</if>
+            <if test="thresholdValue != null">#{thresholdValue},</if>
+            <if test="energy != null">#{energy},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCfConfigEmissionFixed" parameterType="CfConfigEmissionFixed">
+        update cf_config_emission_fixed
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="thresholdValue != null">threshold_value = #{thresholdValue},</if>
+            <if test="energy != null">energy = #{energy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCfConfigEmissionFixedById" parameterType="Long">
+        delete from cf_config_emission_fixed where id = #{id}
+    </delete>
+
+    <delete id="deleteCfConfigEmissionFixedByIds" parameterType="String">
+        delete from cf_config_emission_fixed where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.generator.mapper.SysComQueryMapper">
+    
+    <resultMap type="SysComQuery" id="SysComQueryResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="code"    column="code"    />
+        <result property="remark"    column="remark"    />
+        <result property="customSql"    column="custom_sql"    />
+        <result property="type"    column="type"    />
+        <result property="config"    column="config"    />
+    </resultMap>
+    
+    <resultMap type="SysDictData" id="SysDictDataResult">
+		<result property="dictLabel"  column="dict_label"  />
+		<result property="dictValue"  column="dict_value"  />
+	</resultMap>
+
+    <sql id="selectSysComQueryVo">
+        select id, name, code, remark, custom_sql, type, config from sys_com_query
+    </sql>
+
+    <select id="selectSysComQueryList" parameterType="SysComQuery" resultMap="SysComQueryResult">
+        <include refid="selectSysComQueryVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysComQueryById" parameterType="Long" resultMap="SysComQueryResult">
+        <include refid="selectSysComQueryVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysComQuery" parameterType="SysComQuery" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_com_query
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="code != null and code != ''">code,</if>
+            <if test="remark != null">remark,</if>
+            <if test="customSql != null and customSql != ''">custom_sql,</if>
+            <if test="type != null and type != ''">type,</if>
+            <if test="config != null">config,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="code != null and code != ''">#{code},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="customSql != null and customSql != ''">#{customSql},</if>
+            <if test="type != null and type != ''">#{type},</if>
+            <if test="config != null">#{config},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysComQuery" parameterType="SysComQuery">
+        update sys_com_query
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="code != null and code != ''">code = #{code},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="customSql != null and customSql != ''">custom_sql = #{customSql},</if>
+            <if test="type != null and type != ''">type = #{type},</if>
+            <if test="config != null">config = #{config},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysComQueryById" parameterType="Long">
+        delete from sys_com_query where id = #{id}
+    </delete>
+
+    <delete id="deleteSysComQueryByIds" parameterType="String">
+        delete from sys_com_query where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <select id="selectQueryData" parameterType="SysComQuery" resultMap="SysDictDataResult">
+    		${customSql}
+    </select>
+</mapper>

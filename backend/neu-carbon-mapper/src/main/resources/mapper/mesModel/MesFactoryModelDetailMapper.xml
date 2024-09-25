@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.mes.mapper.MesFactoryModelDetailMapper">
+    
+    <resultMap type="MesFactoryModelDetail" id="MesFactoryModelDetailResult">
+        <result property="id"    column="id"    />
+        <result property="productLineId"    column="product_line_id"    />
+        <result property="equipmentId"    column="equipment_id"    />
+    </resultMap>
+
+    <sql id="selectMesFactoryModelDetailVo">
+        select id, product_line_id, equipment_id from mes_factory_model_detail
+    </sql>
+
+    <select id="selectMesFactoryModelDetailList" parameterType="MesFactoryModelDetail" resultMap="MesFactoryModelDetailResult">
+        <include refid="selectMesFactoryModelDetailVo"/>
+        <where>  
+            <if test="productLineId != null "> and product_line_id = #{productLineId}</if>
+            <if test="equipmentId != null "> and equipment_id = #{equipmentId}</if>
+        </where>
+    </select>
+    
+    <select id="selectMesFactoryModelDetailById" parameterType="Long" resultMap="MesFactoryModelDetailResult">
+        <include refid="selectMesFactoryModelDetailVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertMesFactoryModelDetail" parameterType="MesFactoryModelDetail" useGeneratedKeys="true" keyProperty="id">
+        insert into mes_factory_model_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productLineId != null">product_line_id,</if>
+            <if test="equipmentId != null">equipment_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productLineId != null">#{productLineId},</if>
+            <if test="equipmentId != null">#{equipmentId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMesFactoryModelDetail" parameterType="MesFactoryModelDetail">
+        update mes_factory_model_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productLineId != null">product_line_id = #{productLineId},</if>
+            <if test="equipmentId != null">equipment_id = #{equipmentId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMesFactoryModelDetailById" parameterType="Long">
+        delete from mes_factory_model_detail where id = #{id}
+    </delete>
+
+    <delete id="deleteMesFactoryModelDetailByIds" parameterType="String">
+        delete from mes_factory_model_detail where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

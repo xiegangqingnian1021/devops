@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.footprint.mapper.CfConfigEmissionChangeMapper">
+    
+    <resultMap type="CfConfigEmissionChange" id="CfConfigEmissionChangeResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="daySaveWater"    column="day_save_water"    />
+        <result property="daySaveElectric"    column="day_save_electric"    />
+        <result property="remark"    column="remark"    />
+        <result property="category"    column="category"    />
+    </resultMap>
+
+    <sql id="selectCfConfigEmissionChangeVo">
+        select id, name, category,day_save_water, day_save_electric, remark from cf_config_emission_change
+    </sql>
+
+    <select id="selectCfConfigEmissionChangeList" parameterType="CfConfigEmissionChange" resultMap="CfConfigEmissionChangeResult">
+        <include refid="selectCfConfigEmissionChangeVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="category != null  and category != ''"> and category = #{category}</if>
+        </where>
+    </select>
+    
+    <select id="selectCfConfigEmissionChangeById" parameterType="Long" resultMap="CfConfigEmissionChangeResult">
+        <include refid="selectCfConfigEmissionChangeVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertCfConfigEmissionChange" parameterType="CfConfigEmissionChange">
+        insert into cf_config_emission_change
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="category != null">category,</if>
+            <if test="daySaveWater != null">day_save_water,</if>
+            <if test="daySaveElectric != null">day_save_electric,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="category != null">#{category},</if>
+            <if test="daySaveWater != null">#{daySaveWater},</if>
+            <if test="daySaveElectric != null">#{daySaveElectric},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCfConfigEmissionChange" parameterType="CfConfigEmissionChange">
+        update cf_config_emission_change
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="daySaveWater != null">day_save_water = #{daySaveWater},</if>
+            <if test="daySaveElectric != null">day_save_electric = #{daySaveElectric},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCfConfigEmissionChangeById" parameterType="Long">
+        delete from cf_config_emission_change where id = #{id}
+    </delete>
+
+    <delete id="deleteCfConfigEmissionChangeByIds" parameterType="String">
+        delete from cf_config_emission_change where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

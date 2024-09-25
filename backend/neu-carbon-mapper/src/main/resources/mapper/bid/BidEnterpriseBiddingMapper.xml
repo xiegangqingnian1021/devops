@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.bid.mapper.BidEnterpriseBiddingMapper">
+    
+    <resultMap type="BidEnterpriseBidding" id="BidEnterpriseBiddingResult">
+        <result property="id"    column="id"    />
+        <result property="enterpriseId"    column="enterprise_id"    />
+        <result property="bidId"    column="bid_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="status"    column="status"    />
+        <association property="enterprise" column="enterprise_id" javaType="BidEnterprise" select="getBidEnterprise"/>
+        <association property="bidBidding" column="bid_id" javaType="BidBidding" select="getBidBidding"/>
+        <collection property="filesList" column="id" javaType="java.util.List" ofType="BidEnterpriseBidfile"
+                     select="getEnterpriseBidFiles"/>
+    </resultMap>
+
+    <resultMap type="BidEnterpriseBidfile" id="BidEnterpriseBidfileResult">
+        <result property="id"    column="id"    />
+        <result property="enterpriseBidId"    column="enterprise_bid_id"    />
+        <result property="fileName"    column="file_name"    />
+        <result property="filePath"    column="file_path"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+
+    </resultMap>
+
+    <select id="getEnterpriseBidFiles" resultMap="BidEnterpriseBidfileResult" >
+        select id, enterprise_bid_id, file_name, file_path, create_time, update_by, update_time, remark from bid_enterprise_bidfile
+        where enterprise_bid_id=#{id}
+    </select>
+
+    <sql id="selectBidEnterpriseBiddingVo">
+        select id, enterprise_id, bid_id, create_by, create_time, update_by, update_time, remark, status from bid_enterprise_bidding
+    </sql>
+    <resultMap type="BidEnterprise" id="BidEnterpriseResult">
+        <result property="id"    column="id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="affiliation"    column="affiliation"    />
+        <result property="password"    column="password"    />
+        <result property="salt"    column="salt"    />
+        <result property="mobile"    column="mobile"    />
+        <result property="name"    column="name"    />
+        <result property="shortName"    column="short_name"    />
+        <result property="addr"    column="addr"    />
+        <result property="bank"    column="bank"    />
+        <result property="account"    column="account"    />
+        <result property="taxNo"    column="tax_no"    />
+        <result property="contact"    column="contact"    />
+        <result property="contactTel"    column="contact_tel"    />
+        <result property="usci"    column="usci"    />
+        <result property="address"    column="address"    />
+        <result property="enterpriseNature"    column="enterprise_nature"    />
+        <result property="doe"    column="doe"    />
+        <result property="corpn"    column="corpn"    />
+        <result property="corpnIdcard"    column="corpn_idcard"    />
+        <result property="contactAddress"    column="contact_address"    />
+        <result property="businessScope"    column="business_scope"    />
+        <result property="profile"    column="profile"    />
+        <result property="businessLicenseImage"    column="business_license_image"    />
+        <result property="businessLicenseGp"    column="business_license_gp"    />
+        <result property="corpnIdcardImage"    column="corpn_idcard_image"    />
+        <result property="registrationPhone"    column="registration_phone"    />
+        <result property="contactAddr"    column="contact_addr"    />
+        <result property="registeredCapital"    column="registered_capital"    />
+        <result property="paidinCapital"    column="paidin_capital"    />
+        <result property="accountLicence"    column="account_licence"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+    <select id="getBidEnterprise" resultMap="BidEnterpriseResult" >
+        select id, user_name, affiliation, password, salt, mobile, name, short_name, addr, bank, account, tax_no, contact, contact_tel, usci, address, enterprise_nature, doe, corpn, corpn_idcard, contact_address, business_scope, profile, business_license_image, business_license_gp, corpn_idcard_image, registration_phone, contact_addr, registered_capital, paidin_capital, account_licence, create_by, create_time, update_by, update_time, remark from bid_enterprise
+        where id=#{enterpriseId}
+    </select>
+    <resultMap type="BidBidding" id="BidBiddingResult">
+        <result property="id"    column="id"     />
+        <result property="bidTitle"    column="bid_title"    />
+        <result property="bidContent"    column="bid_content"    />
+        <result property="bidPublishDatetime"    column="bid_publish_datetime"    />
+        <result property="bidPublisher"    column="bid_publisher"    />
+        <result property="category"    column="category"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="beginDate"    column="begin_date"    />
+        <result property="endDate"    column="end_date"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+    <select id="getBidBidding" resultMap="BidBiddingResult" >
+        select id, bid_title, bid_content, bid_publish_datetime, bid_publisher, category, create_by, create_time, update_by, update_time, remark, begin_date, end_date, status from bid_bidding
+        where id=#{bidId}
+    </select>
+
+    <select id="selectBidEnterpriseBiddingList" parameterType="BidEnterpriseBidding" resultMap="BidEnterpriseBiddingResult">
+        <include refid="selectBidEnterpriseBiddingVo"/>
+        <where>  
+            <if test="enterpriseId != null "> and enterprise_id = #{enterpriseId}</if>
+            <if test="bidId != null "> and bid_id = #{bidId}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectBidEnterpriseBiddingById" parameterType="Long" resultMap="BidEnterpriseBiddingResult">
+        <include refid="selectBidEnterpriseBiddingVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertBidEnterpriseBidding" parameterType="BidEnterpriseBidding">
+        insert into bid_enterprise_bidding
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="enterpriseId != null">enterprise_id,</if>
+            <if test="bidId != null">bid_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="status != null">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="enterpriseId != null">#{enterpriseId},</if>
+            <if test="bidId != null">#{bidId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="status != null">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBidEnterpriseBidding" parameterType="BidEnterpriseBidding">
+        update bid_enterprise_bidding
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="enterpriseId != null">enterprise_id = #{enterpriseId},</if>
+            <if test="bidId != null">bid_id = #{bidId},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBidEnterpriseBiddingById" parameterType="Long">
+        delete from bid_enterprise_bidding where id = #{id}
+    </delete>
+
+    <delete id="deleteBidEnterpriseBiddingByIds" parameterType="String">
+        delete from bid_enterprise_bidding where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

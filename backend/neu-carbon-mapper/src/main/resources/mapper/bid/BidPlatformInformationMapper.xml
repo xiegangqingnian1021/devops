@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.bid.mapper.BidPlatformInformationMapper">
+    
+    <resultMap type="BidPlatformInformation" id="BidPlatformInformationResult">
+        <result property="id"    column="id"    />
+        <result property="title"    column="title"    />
+        <result property="content"    column="content"    />
+        <result property="publishDatetime"    column="publish_datetime"    />
+        <result property="publisher"    column="publisher"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectBidPlatformInformationVo">
+        select id, title, content, publish_datetime, publisher, create_by, create_time, update_by, update_time, remark from bid_platform_information
+    </sql>
+
+    <select id="selectBidPlatformInformationList" parameterType="BidPlatformInformation" resultMap="BidPlatformInformationResult">
+        <include refid="selectBidPlatformInformationVo"/>
+        <where>  
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="publishDatetime != null "> and publish_datetime = #{publishDatetime}</if>
+            <if test="publisher != null  and publisher != ''"> and publisher = #{publisher}</if>
+        </where>
+    </select>
+    
+    <select id="selectBidPlatformInformationById" parameterType="Long" resultMap="BidPlatformInformationResult">
+        <include refid="selectBidPlatformInformationVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertBidPlatformInformation" parameterType="BidPlatformInformation">
+        insert into bid_platform_information
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="publishDatetime != null">publish_datetime,</if>
+            <if test="publisher != null">publisher,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="publishDatetime != null">#{publishDatetime},</if>
+            <if test="publisher != null">#{publisher},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBidPlatformInformation" parameterType="BidPlatformInformation">
+        update bid_platform_information
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="publishDatetime != null">publish_datetime = #{publishDatetime},</if>
+            <if test="publisher != null">publisher = #{publisher},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBidPlatformInformationById" parameterType="Long">
+        delete from bid_platform_information where id = #{id}
+    </delete>
+
+    <delete id="deleteBidPlatformInformationByIds" parameterType="String">
+        delete from bid_platform_information where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

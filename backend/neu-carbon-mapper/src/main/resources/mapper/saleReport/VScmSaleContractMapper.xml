@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.scm.mapper.VScmSaleContractMapper">
+    
+    <resultMap type="VScmSaleContract" id="VScmSaleContractResult">
+        <result property="contractId"    column="contract_id"    />
+        <result property="contractNo"    column="contract_no"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="orderNo"    column="order_no"    />
+        <result property="customerId"    column="customer_id"    />
+        <result property="customerName"    column="customer_name"    />
+        <result property="contractAmount"    column="contract_amount"    />
+        <result property="contractYear"    column="contract_year"    />
+        <result property="contractQuarter"    column="contract_quarter"    />
+        <result property="contractMonth"    column="contract_month"    />
+        <result property="contractYearMonth"    column="contract_year_month"    />
+        <result property="contractDate"    column="contract_date"    />
+        <result property="totalAmount"    column="total_amount"    />
+    </resultMap>
+
+    <sql id="selectVScmSaleContractVo">
+        select contract_id, contract_no, order_id, order_no, customer_id, customer_name, contract_amount, contract_year, contract_quarter, contract_month, contract_year_month, contract_date from v_scm_sale_contract
+    </sql>
+
+    <select id="selectVScmSaleContractList" parameterType="VScmSaleContract" resultMap="VScmSaleContractResult">
+        <include refid="selectVScmSaleContractVo"/>
+        <where>  
+            <if test="contractId != null "> and contract_id = #{contractId}</if>
+            <if test="contractNo != null  and contractNo != ''"> and contract_no like concat('%', #{contractNo}, '%')</if>
+            <if test="orderId != null "> and order_id = #{orderId}</if>
+            <if test="orderNo != null  and orderNo != ''"> and order_no like concat('%', #{orderNo}, '%')</if>
+            <if test="customerId != null "> and customer_id = #{customerId}</if>
+            <if test="customerName != null  and customerName != ''"> and customer_name like concat('%', #{customerName}, '%')</if>
+            <if test="contractAmount != null "> and contract_amount = #{contractAmount}</if>
+            <if test="contractYear != null  and contractYear != ''"> and contract_year = #{contractYear}</if>
+            <if test="contractQuarter != null "> and contract_quarter = #{contractQuarter}</if>
+            <if test="contractMonth != null "> and contract_month = #{contractMonth}</if>
+            <if test="contractYearMonth != null  and contractYearMonth != ''"> and contract_year_month = #{contractYearMonth}</if>
+            <if test="contractDate != null  and contractDate != ''"> and contract_date = #{contractDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectVScmSaleContractById" parameterType="Long" resultMap="VScmSaleContractResult">
+        <include refid="selectVScmSaleContractVo"/>
+        where contract_id = #{contractId}
+    </select>
+
+
+    <select id="selectMonthSaleContractReport" parameterType="VScmSaleContract" resultMap="VScmSaleContractResult">
+        SELECT
+            ym.`month` as contract_month,
+            IFNULL(tm.total,0) total_amount,
+            tm.customer_id,
+            tm.customer_name
+        FROM
+            rep_year_month ym
+                LEFT JOIN (
+                SELECT
+                    customer_id,
+                    customer_name,
+                    IFNULL(SUM(contract_amount), 0) total,
+                    contract_month
+                FROM
+                    v_scm_sale_contract
+                <where>
+                    <if test="contractYear != null  and contractYear != ''"> and contract_year = #{contractYear}</if>
+                    <if test="customerId != null "> and customer_id = #{customerId}</if>
+                </where>
+                GROUP BY
+                    contract_month,customer_id
+            ) tm ON ym.NO = tm.contract_month
+        ORDER BY ym.no
+    </select>
+
+
+    <select id="selectQuarterSaleContractReport" parameterType="VScmSaleContract" resultMap="VScmSaleContractResult">
+        SELECT
+        yq.`quarter` as contract_quarter,
+        IFNULL(tm.total,0) total_amount,
+        tm.customer_id,
+        tm.customer_name
+        FROM
+        rep_year_quarter yq
+        LEFT JOIN (
+        SELECT
+        customer_id,
+        customer_name,
+        IFNULL(SUM(contract_amount), 0) total,
+        contract_quarter
+        FROM
+        v_scm_sale_contract
+        <where>
+            <if test="contractYear != null  and contractYear != ''"> and contract_year = #{contractYear}</if>
+            <if test="customerId != null "> and customer_id = #{customerId}</if>
+        </where>
+        GROUP BY
+        contract_quarter,customer_id
+        ) tm ON yq.NO = tm.contract_quarter
+        ORDER BY yq.no
+    </select>
+
+    <select id="selectMonthOrderStatReport" parameterType="VScmSaleContract" resultMap="VScmSaleContractResult">
+        SELECT
+        ym.`month` as contract_month,
+        tm.contract_no,
+        tm.customer_id,
+        tm.customer_name,
+        IFNULL(tm.total,0) total_amount
+        FROM
+        rep_year_month ym
+        LEFT JOIN (
+        SELECT
+        contract_id,
+        contract_no,
+        customer_id,
+        customer_name,
+        IFNULL(SUM(contract_amount), 0) total,
+        contract_month
+        FROM
+        v_scm_sale_contract
+        <where>
+            <if test="contractYear != null  and contractYear != ''"> and contract_year = #{contractYear}</if>
+            <if test="customerId != null "> and customer_id = #{customerId}</if>
+            <if test="contractNo != null  and contractNo != ''"> and contract_no like concat('%', #{contractNo}, '%')</if>
+        </where>
+        GROUP BY
+        contract_month,customer_id,contract_id
+        ) tm ON ym.NO = tm.contract_month
+        ORDER BY ym.no
+    </select>
+
+
+    <select id="selectQuarterOrderStatReport" parameterType="VScmSaleContract" resultMap="VScmSaleContractResult">
+        SELECT
+        yq.`quarter` as contract_quarter,
+        tm.contract_no,
+        tm.customer_id,
+        tm.customer_name,
+        IFNULL(tm.total,0) total_amount
+        FROM
+        rep_year_quarter yq
+        LEFT JOIN (
+        SELECT
+        contract_id,
+        contract_no,
+        customer_id,
+        customer_name,
+        IFNULL(SUM(contract_amount), 0) total,
+        contract_quarter
+        FROM
+        v_scm_sale_contract
+        <where>
+            <if test="contractYear != null  and contractYear != ''"> and contract_year = #{contractYear}</if>
+            <if test="customerId != null "> and customer_id = #{customerId}</if>
+            <if test="contractNo != null  and contractNo != ''"> and contract_no like concat('%', #{contractNo}, '%')</if>
+        </where>
+        GROUP BY
+        contract_quarter,customer_id,contract_id
+        ) tm ON yq.NO = tm.contract_quarter
+        ORDER BY yq.no
+    </select>
+
+
+
+    <resultMap type="VScmFinanceReport" id="VScmFinanceReportResult">
+        <result property="year"    column="year"    />
+        <result property="quarter"    column="quarter"    />
+        <result property="month"    column="month"    />
+        <result property="purchaseContractTotal"    column="purchase_contract_total"    />
+        <result property="purchaseReturnTotal"    column="purchase_return_total"    />
+        <result property="saleContractTotal"    column="sale_contract_total"    />
+        <result property="saleReturnTotal"    column="sale_return_total"    />
+        <result property="incomeTotal"    column="income_total"    />
+        <result property="outcomeTotal"    column="outcome_total"    />
+    </resultMap>
+
+
+
+    <select id="selectMonthFinanceReport" parameterType="VScmFinanceReport" resultMap="VScmFinanceReportResult">
+        SELECT
+            ym.`month`,
+            IFNULL( purchase_return_total, 0 ) purchase_return_total,
+            IFNULL( purchase_contract_total, 0 ) purchase_contract_total,
+            IFNULL( sale_contract_total, 0 ) sale_contract_total,
+            IFNULL( sale_return_total, 0 ) sale_return_total,
+            (IFNULL( sale_contract_total, 0 )  - IFNULL(sale_return_total, 0 ) ) income_total,
+            (IFNULL( purchase_contract_total, 0) -IFNULL(purchase_return_total, 0 ) ) outcome_total
+        FROM
+            rep_year_month ym
+                LEFT JOIN (
+                SELECT
+                    return_month,
+                    IFNULL( sum( t.return_amount ), 0 ) purchase_return_total
+                FROM
+                    ( SELECT *, QUARTER ( return_date ) AS return_quarter, MONTH ( return_date ) AS return_month,
+                          date_format( return_date, '%Y' ) AS return_year FROM scm_purchase_return) t
+                WHERE
+                    return_year = #{year}
+                GROUP BY
+                    return_month
+            ) pr ON pr.return_month = ym.NO
+                LEFT JOIN (
+                SELECT
+                    contract_month,
+                    IFNULL( sum( t.amount ), 0 ) purchase_contract_total
+                FROM
+                    ( SELECT *, QUARTER (sign_date) AS contract_quarter, MONTH (sign_date) AS contract_month,
+                          date_format(sign_date, '%Y' ) AS contract_year FROM scm_purchase_contract ) t
+                WHERE
+                    contract_year = #{year} and t.audit_status = 1
+                GROUP BY
+                    contract_month
+            ) pc ON pc.contract_month = ym.NO
+                LEFT JOIN (
+                SELECT
+                    contract_month,
+                    IFNULL( sum( t.contract_amount), 0 ) sale_contract_total
+                FROM
+                    ( SELECT *, QUARTER (sign_date) AS contract_quarter, MONTH (sign_date) AS contract_month,
+                          date_format(sign_date, '%Y' ) AS contract_year FROM scm_sale_contract ) t
+                WHERE
+                    contract_year = #{year} and t.audit_status = 1
+                GROUP BY
+                    contract_month
+            ) sc ON sc.contract_month = ym.NO
+                LEFT JOIN (
+                SELECT
+                    return_month,
+                    IFNULL( sum( t.return_amount ), 0 ) sale_return_total
+                FROM
+                    ( SELECT *, QUARTER ( return_date ) AS return_quarter, MONTH ( return_date ) AS return_month,
+                          date_format( return_date, '%Y' ) AS return_year FROM scm_sale_return ) t
+                WHERE
+                    return_year = #{year}
+                GROUP BY
+                    return_month
+            ) sr ON sr.return_month = ym.NO
+        ORDER BY ym.no
+    </select>
+
+    <select id="selectQuarterFinanceReport" parameterType="VScmFinanceReport" resultMap="VScmFinanceReportResult">
+        SELECT
+            yq.`quarter`,
+            IFNULL( purchase_return_total, 0 ) purchase_return_total,
+            IFNULL( purchase_contract_total, 0 ) purchase_contract_total,
+            IFNULL( sale_contract_total, 0 ) sale_contract_total,
+            IFNULL( sale_return_total, 0 ) sale_return_total,
+            (IFNULL( sale_contract_total, 0 )  - IFNULL(sale_return_total, 0 ) ) income_total,
+            (IFNULL( purchase_contract_total, 0) -IFNULL(purchase_return_total, 0 ) ) outcome_total
+        FROM
+            rep_year_quarter yq
+                LEFT JOIN (
+                SELECT
+                    return_quarter,
+                    IFNULL( sum( t.return_amount ), 0 ) purchase_return_total
+                FROM
+                    ( SELECT *, QUARTER ( return_date ) AS return_quarter, MONTH ( return_date ) AS return_month,
+                          date_format( return_date, '%Y' ) AS return_year FROM scm_purchase_return) t
+                WHERE
+                    return_year = #{year}
+                GROUP BY
+                    return_quarter
+            ) pr ON pr.return_quarter = yq.NO
+                LEFT JOIN (
+                SELECT
+                    contract_quarter,
+                    IFNULL( sum( t.amount ), 0 ) purchase_contract_total
+                FROM
+                    ( SELECT *, QUARTER (sign_date) AS contract_quarter, MONTH (sign_date) AS contract_month,
+                          date_format(sign_date, '%Y' ) AS contract_year FROM scm_purchase_contract ) t
+                WHERE
+                    contract_year = #{year} and t.audit_status = 1
+                GROUP BY
+                    contract_quarter
+            ) pc ON pc.contract_quarter = yq.NO
+
+                LEFT JOIN (
+                SELECT
+                    contract_quarter,
+                    IFNULL( sum( t.contract_amount), 0 ) sale_contract_total
+                FROM
+                    ( SELECT *, QUARTER (sign_date) AS contract_quarter, MONTH (sign_date) AS contract_month,
+                          date_format(sign_date, '%Y' ) AS contract_year FROM scm_sale_contract ) t
+                WHERE
+                    contract_year = #{year} and t.audit_status = 1
+                GROUP BY
+                    contract_quarter
+            ) sc ON sc.contract_quarter = yq.NO
+                LEFT JOIN (
+                SELECT
+                    return_quarter,
+                    IFNULL( sum( t.return_amount ), 0 ) sale_return_total
+                FROM
+                    ( SELECT *, QUARTER ( return_date ) AS return_quarter, MONTH ( return_date ) AS return_month,
+                          date_format( return_date, '%Y' ) AS return_year FROM scm_sale_return ) t
+                WHERE
+                    return_year = #{year}
+                GROUP BY
+                    return_quarter
+            ) sr ON sr.return_quarter = yq.NO
+        ORDER BY yq.no
+    </select>
+
+
+    <select id="selectSaleCustomerRank" resultType="map">
+        select t.customer_name name, t.total/10000 `value` from
+            ( SELECT customer_id, customer_name, sum( contract_amount ) total FROM v_scm_sale_contract GROUP BY customer_id ) t
+        ORDER BY t.total desc limit 8
+    </select>
+
+
+    <select id="selectSaleStatByMonth" resultType="map">
+        select
+            (SELECT
+                 ifnull(sum( contract_amount ),0) total
+             FROM
+                 v_scm_sale_contract vc
+             WHERE
+                     vc.contract_year_month = #{month} ) contractTotal,
+
+            (SELECT
+                 ifnull(sum( order_amount ),0) total
+             FROM
+                 v_scm_sale_order vo
+             WHERE
+                 vo.order_year_month = #{month}  ) orderTotal
+    </select>
+
+    <select id="selectSaleOverall" resultType="map">
+        select
+            (SELECT
+                 ifnull(sum( contract_amount ),0) total
+             FROM
+                 v_scm_sale_contract vc
+             WHERE
+                 vc.contract_date = DATE_FORMAT( NOW(), '%Y-%m-%d')) todayTotal,
+
+
+            (SELECT
+                 sum( contract_amount ) total
+             FROM
+                 v_scm_sale_contract vc
+             WHERE
+                 vc.contract_year_month = DATE_FORMAT( NOW(), '%Y-%m'))monthTotal,
+
+
+            (SELECT
+                 sum( contract_amount ) total
+             FROM
+                 v_scm_sale_contract vc
+             WHERE
+                 vc.contract_year = DATE_FORMAT( NOW(), '%Y')) yearTotal
+    </select>
+
+
+
+        
+
+</mapper>

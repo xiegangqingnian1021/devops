@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.scm.mapper.VScmSaleContractDetailMapper">
+    
+    <resultMap type="VScmSaleContractDetail" id="VScmSaleContractDetailResult">
+        <result property="contractId"    column="contract_id"    />
+        <result property="contractNo"    column="contract_no"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="orderNo"    column="order_no"    />
+        <result property="customerId"    column="customer_id"    />
+        <result property="contractAmount"    column="contract_amount"    />
+        <result property="signDate"    column="sign_date"    />
+        <result property="customerName"    column="customer_name"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="price"    column="price"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="amount"    column="amount"    />
+        <result property="materialName"    column="material_name"    />
+        <result property="materialModel"    column="material_model"    />
+        <result property="materialSpecification"    column="material_specification"    />
+        <result property="materialUnit"    column="material_unit"    />
+        <result property="returnTotal"    column="return_total"    />
+    </resultMap>
+
+    <sql id="selectVScmSaleContractDetailVo">
+        select contract_id, contract_no, order_id, order_no, customer_id, contract_amount, sign_date, customer_name, material_id, price, quantity, amount, material_name, material_model, material_specification, material_unit from v_scm_sale_contract_detail
+    </sql>
+
+    <select id="selectVScmSaleContractDetailList" parameterType="VScmSaleContractDetail" resultMap="VScmSaleContractDetailResult">
+        <include refid="selectVScmSaleContractDetailVo"/>
+        <where>  
+            <if test="contractId != null "> and contract_id = #{contractId}</if>
+            <if test="contractNo != null  and contractNo != ''"> and contract_no = #{contractNo}</if>
+            <if test="orderId != null "> and order_id = #{orderId}</if>
+            <if test="orderNo != null  and orderNo != ''"> and order_no = #{orderNo}</if>
+            <if test="customerId != null "> and customer_id = #{customerId}</if>
+            <if test="params.beginSignDate != null and params.beginSignDate != '' and params.endSignDate != null and params.endSignDate != ''"> and sign_date between #{params.beginSignDate} and #{params.endSignDate}</if>
+            <if test="customerName != null  and customerName != ''"> and customer_name like concat('%', #{customerName}, '%')</if>
+            <if test="materialId != null "> and material_id = #{materialId}</if>
+            <if test="materialName != null  and materialName != ''"> and material_name like concat('%', #{materialName}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectSaleBookReport" parameterType="VScmSaleContractDetail" resultMap="VScmSaleContractDetailResult">
+        SELECT
+            vcd.*,
+            tm.return_total
+        FROM
+            v_scm_sale_contract_detail vcd
+        LEFT JOIN (
+            SELECT
+                r.contract_id,
+                rd.material_id,
+                ifnull(sum( rd.return_quantity * rd.price ), 0) return_total
+            FROM
+            scm_sale_return_detail rd
+            INNER JOIN scm_sale_return r ON r.id = rd.return_id
+            GROUP BY r.contract_id, rd.material_id
+        ) tm ON tm.contract_id = vcd.contract_id
+        AND tm.material_id = vcd.material_id
+        <where>
+            <if test="contractId != null "> and vcd.contract_id = #{contractId}</if>
+            <if test="contractNo != null  and contractNo != ''"> and vcd.contract_no = #{contractNo}</if>
+            <if test="orderId != null "> and vcd.order_id = #{orderId}</if>
+            <if test="orderNo != null  and orderNo != ''"> and vcd.order_no = #{orderNo}</if>
+            <if test="customerId != null "> and vcd.customer_id = #{customerId}</if>
+            <if test="params.beginSignDate != null and params.beginSignDate != '' and params.endSignDate != null and params.endSignDate != ''"> and vcd.sign_date between #{params.beginSignDate} and #{params.endSignDate}</if>
+            <if test="customerName != null  and customerName != ''"> and vcd.customer_name like concat('%', #{customerName}, '%')</if>
+            <if test="materialId != null "> and vcd.material_id = #{materialId}</if>
+            <if test="materialName != null  and materialName != ''"> and vcd.material_name like concat('%', #{materialName}, '%')</if>
+        </where>
+    </select>
+
+
+
+
+    <resultMap type="RepContractDeliveryReturnDetail" id="RepContractDeliveryReturnDetailResult">
+        <result property="contractQuarter"    column="contract_quarter"    />
+        <result property="contractMonth"    column="contract_month"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="materialCode"    column="material_code"    />
+        <result property="materialModel"    column="material_model"    />
+        <result property="materialSpecification"    column="material_specification"    />
+        <result property="materialUnit"    column="material_unit"    />
+        <result property="materialName"    column="material_name"    />
+        <result property="saleNum"    column="sale_num"    />
+        <result property="incomeAmount"    column="income_amount"    />
+        <result property="deliveryNum"    column="delivery_num"    />
+        <result property="returnNum"    column="return_num"    />
+        <result property="returnAmount"    column="return_amount"    />
+    </resultMap>
+
+
+
+    <select id="selectContractDeliveryReturnMonthReport" parameterType="RepContractDeliveryReturnDetail" resultMap="RepContractDeliveryReturnDetailResult">
+        select ym.MONTH as contract_month,material_id, material_code, material_model, material_specification, material_unit, material_name, sale_num, income_amount, delivery_num, return_num, return_amount
+        FROM
+            rep_year_month ym
+                LEFT JOIN (
+                SELECT
+                    sc.contract_month,
+                    sc.material_id,
+                    m.CODE AS material_code,
+                    m.model AS material_model,
+                    m.specification AS material_specification,
+                    m.unit AS material_unit,
+                    m.NAME AS material_name,
+                    IFNULL( sc.sale_num, 0 ) sale_num,
+                    IFNULL( sc.contract_amount, 0 ) income_amount,
+                    IFNULL( sd.delivery_num, 0 ) delivery_num,
+                    IFNULL( sr.return_num, 0 ) return_num,
+                    IFNULL( sr.return_amount, 0 ) return_amount
+                FROM
+                    (
+                        SELECT
+                            d.material_id,
+                            ifnull( sum( d.quantity ), 0 ) sale_num,
+                            ifnull( sum( d.quantity * d.price ), 0 ) contract_amount,
+                            MONTH ( c.sign_date ) AS contract_month
+                        FROM
+                            scm_sale_contract c
+                            INNER JOIN scm_sale_contract_detail d ON d.contract_id = c.id
+                        <where>
+                            c.audit_status = '1'
+                            <if test="customerId != null "> and c.customer_id = #{customerId}</if>
+                            <if test="contractYear != null "> and date_format( c.sign_date, '%Y' ) = #{contractYear}</if>
+                        </where>
+                        GROUP BY
+                            contract_month,
+                            d.material_id
+                    ) sc
+                        LEFT JOIN (
+                        SELECT
+                            d.material_id,
+                            ifnull( sum( d.quantity ), 0 ) delivery_num,
+                            MONTH ( s.delivery_date ) AS delivery_month
+                        FROM
+                            scm_sale_delivery s
+                            INNER JOIN scm_sale_delivery_detail d ON d.delivery_id = s.id
+                        <where>
+                            <if test="customerId != null "> and s.customer_id = #{customerId}</if>
+                            <if test="contractYear != null "> and date_format( s.delivery_date, '%Y' ) = #{contractYear}</if>
+                        </where>
+                        GROUP BY
+                            delivery_month,
+                            d.material_id
+                    ) sd ON sd.material_id = sc.material_id
+                        AND sd.delivery_month = sc.contract_month
+                        LEFT JOIN (
+                        SELECT
+                            d.material_id,
+                            ifnull( sum( d.return_quantity ), 0 ) return_num,
+                            ifnull( sum( d.return_quantity * d.price ), 0 ) return_amount,
+                            MONTH ( r.return_date ) AS return_month
+                        FROM
+                            scm_sale_return r
+                            INNER JOIN scm_sale_return_detail d ON d.return_id = r.id
+                        <where>
+                            <if test="customerId != null "> and r.customer_id = #{customerId}</if>
+                            <if test="contractYear != null "> and date_format( r.return_date, '%Y' ) = #{contractYear}</if>
+                        </where>
+                        GROUP BY
+                            return_month,
+                            d.material_id
+                    ) sr ON sr.material_id = sc.material_id
+                        AND sr.return_month = sc.contract_month
+                        LEFT JOIN wms_material_info m ON m.id = sc.material_id
+                        <where>
+                            <if test="materialName != null  and materialName != ''"> and m.name like concat('%', #{materialName}, '%')</if>
+                        </where>
+            ) tm ON tm.contract_month = ym.NO
+    </select>
+
+
+    <select id="selectContractDeliveryReturnQuarterReport" parameterType="RepContractDeliveryReturnDetail" resultMap="RepContractDeliveryReturnDetailResult">
+        select yq.quarter as contract_quarter,material_id, material_code, material_model, material_specification, material_unit, material_name, sale_num, income_amount, delivery_num, return_num, return_amount
+        FROM
+        rep_year_quarter yq
+        LEFT JOIN (
+        SELECT
+        sc.contract_quarter,
+        sc.material_id,
+        m.CODE AS material_code,
+        m.model AS material_model,
+        m.specification AS material_specification,
+        m.unit AS material_unit,
+        m.NAME AS material_name,
+        IFNULL( sc.sale_num, 0 ) sale_num,
+        IFNULL( sc.contract_amount, 0 ) income_amount,
+        IFNULL( sd.delivery_num, 0 ) delivery_num,
+        IFNULL( sr.return_num, 0 ) return_num,
+        IFNULL( sr.return_amount, 0 ) return_amount
+        FROM
+        (
+        SELECT
+        d.material_id,
+        ifnull( sum( d.quantity ), 0 ) sale_num,
+        ifnull( sum( d.quantity * d.price ), 0 ) contract_amount,
+        QUARTER ( c.sign_date ) AS contract_quarter
+        FROM
+        scm_sale_contract c
+        INNER JOIN scm_sale_contract_detail d ON d.contract_id = c.id
+        <where>
+            c.audit_status = '1'
+            <if test="customerId != null "> and c.customer_id = #{customerId}</if>
+            <if test="contractYear != null "> and date_format( c.sign_date, '%Y' ) = #{contractYear}</if>
+        </where>
+        GROUP BY
+        contract_quarter,
+        d.material_id
+        ) sc
+        LEFT JOIN (
+        SELECT
+        d.material_id,
+        ifnull( sum( d.quantity ), 0 ) delivery_num,
+        QUARTER ( s.delivery_date ) AS delivery_quarter
+        FROM
+        scm_sale_delivery s
+        INNER JOIN scm_sale_delivery_detail d ON d.delivery_id = s.id
+        <where>
+            <if test="customerId != null "> and s.customer_id = #{customerId}</if>
+            <if test="contractYear != null "> and date_format( s.delivery_date, '%Y' ) = #{contractYear}</if>
+        </where>
+        GROUP BY
+        delivery_quarter,
+        d.material_id
+        ) sd ON sd.material_id = sc.material_id
+        AND sd.delivery_quarter = sc.contract_quarter
+        LEFT JOIN (
+        SELECT
+        d.material_id,
+        ifnull( sum( d.return_quantity ), 0 ) return_num,
+        ifnull( sum( d.return_quantity * d.price ), 0 ) return_amount,
+        QUARTER ( r.return_date ) AS return_quarter
+        FROM
+        scm_sale_return r
+        INNER JOIN scm_sale_return_detail d ON d.return_id = r.id
+        <where>
+            <if test="customerId != null "> and r.customer_id = #{customerId}</if>
+            <if test="contractYear != null "> and date_format( r.return_date, '%Y' ) = #{contractYear}</if>
+        </where>
+        GROUP BY
+        return_quarter,
+        d.material_id
+        ) sr ON sr.material_id = sc.material_id
+        AND sr.return_quarter = sc.contract_quarter
+        LEFT JOIN wms_material_info m ON m.id = sc.material_id
+        <where>
+            <if test="materialName != null  and materialName != ''"> and m.name like concat('%', #{materialName}, '%')</if>
+        </where>
+        ) tm ON tm.contract_quarter = yq.NO
+    </select>
+    
+
+</mapper>

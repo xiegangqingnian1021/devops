@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.system.mapper.SysSerialConfigMapper">
+    
+    <resultMap type="SysSerialConfig" id="SysSerialConfigResult">
+        <result property="id"    column="id"    />
+        <result property="bizType"    column="biz_type"    />
+        <result property="prefix"    column="prefix"    />
+        <result property="maxNo"    column="max_no"    />
+    </resultMap>
+
+    <sql id="selectSysSerialConfigVo">
+        select id, biz_type, prefix, max_no from sys_serial_config
+    </sql>
+
+    <select id="selectSysSerialConfigList" parameterType="SysSerialConfig" resultMap="SysSerialConfigResult">
+        <include refid="selectSysSerialConfigVo"/>
+        <where>  
+            <if test="bizType != null  and bizType != ''"> and biz_type = #{bizType}</if>
+            <if test="prefix != null  and prefix != ''"> and prefix = #{prefix}</if>
+            <if test="maxNo != null "> and max_no = #{maxNo}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysSerialConfigById" parameterType="Long" resultMap="SysSerialConfigResult">
+        <include refid="selectSysSerialConfigVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysSerialConfig" parameterType="SysSerialConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_serial_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bizType != null">biz_type,</if>
+            <if test="prefix != null">prefix,</if>
+            <if test="maxNo != null">max_no,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bizType != null">#{bizType},</if>
+            <if test="prefix != null">#{prefix},</if>
+            <if test="maxNo != null">#{maxNo},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysSerialConfig" parameterType="SysSerialConfig">
+        update sys_serial_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bizType != null">biz_type = #{bizType},</if>
+            <if test="prefix != null">prefix = #{prefix},</if>
+            <if test="maxNo != null">max_no = #{maxNo},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysSerialConfigById" parameterType="Long">
+        delete from sys_serial_config where id = #{id}
+    </delete>
+
+    <delete id="deleteSysSerialConfigByIds" parameterType="String">
+        delete from sys_serial_config where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

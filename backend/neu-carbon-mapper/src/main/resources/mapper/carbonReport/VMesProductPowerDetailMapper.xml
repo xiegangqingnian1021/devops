@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.carbon.footprint.mapper.VMesProductPowerDetailMapper">
+    
+    <resultMap type="VMesProductPowerDetail" id="VMesProductPowerDetailResult">
+        <result property="planId"    column="plan_id"    />
+        <result property="bomId"    column="bom_id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="productDate"    column="product_date"    />
+        <result property="productMonth"    column="product_month"    />
+        <result property="productYear"    column="product_year"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="requireQuantity"    column="require_quantity"    />
+        <result property="productQuantity"    column="product_quantity"    />
+        <result property="processId"    column="process_id"    />
+        <result property="productLineId"    column="product_line_id"    />
+        <result property="powerConsume"    column="power_consume"    />
+        <result property="processName"    column="process_name"    />
+        <result property="totalPowerConsume"    column="total_power_consume"    />
+        <result property="productLineName"    column="product_line_name"    />
+        <result property="materialName"    column="material_name"    />
+        <result property="materialModel"    column="material_model"    />
+        <result property="materialUnit"    column="material_unit"    />
+        <result property="materialSpecification"    column="material_specification"    />
+        <result property="totalInventory"    column="total_inventory"    />
+    </resultMap>
+
+    <sql id="selectVMesProductPowerDetailVo">
+        SELECT
+		    plan_id,
+		    bom_id,
+		    order_id,
+		    product_date,
+		    material_id,
+		    SUM(require_quantity) require_quantity,
+		    SUM(product_quantity) product_quantity,
+		    process_id,
+		    product_line_id,
+		    power_consume,
+		    process_name,
+		    SUM(total_power_consume) total_power_consume,
+		    product_line_name,
+		    material_name,
+		    material_model,
+		    material_specification,
+		    material_unit
+		  FROM
+		    `v_mes_product_power_detail`
+    </sql>
+
+    <select id="selectVMesProductPowerDetailList" parameterType="VMesProductPowerDetail" resultMap="VMesProductPowerDetailResult">
+        SELECT
+		  t.*,
+		  m.total_inventory
+		FROM
+		  (
+        <include refid="selectVMesProductPowerDetailVo"/>
+        <where>  
+            <if test="planId != null "> and plan_id = #{planId}</if>
+            <if test="bomId != null "> and bom_id = #{bomId}</if>
+            <if test="orderId != null "> and order_id = #{orderId}</if>
+            <if test="params.beginProductDate != null and params.beginProductDate != '' and params.endProductDate != null and params.endProductDate != ''"> and product_date between #{params.beginProductDate} and #{params.endProductDate}</if>
+            <if test="materialId != null "> and material_id = #{materialId}</if>
+            <if test="processId != null "> and process_id = #{processId}</if>
+            <if test="productLineId != null "> and product_line_id = #{productLineId}</if>
+            <if test="processName != null  and processName != ''"> and process_name like concat('%', #{processName}, '%')</if>
+            <if test="productLineName != null  and productLineName != ''"> and product_line_name like concat('%', #{productLineName}, '%')</if>
+        </where>
+        GROUP BY material_id) t
+        LEFT JOIN (
+	        select w.material_id,sum(w.total_inventory) total_inventory 
+	        from wms_warehouse_material w group by w.material_id
+        ) m ON m.material_id = t.material_id
+  		ORDER BY t.total_power_consume desc
+    </select>
+    
+    <select id="selectVMesProductPowerDetailById" parameterType="Long" resultMap="VMesProductPowerDetailResult">
+        <include refid="selectVMesProductPowerDetailVo"/>
+        where plan_id = #{planId}
+    </select>
+    
+    <select id="selectReportMonth" parameterType="VMesProductPowerDetail" resultMap="VMesProductPowerDetailResult">
+    	SELECT
+		  t.product_month
+		FROM
+		  (SELECT
+		    DATE_FORMAT(product_date, '%Y-%m') product_month
+		  FROM
+		    `v_mes_product_power_detail`
+		  <where> 
+		  	<if test="params.beginProductDate != null and params.beginProductDate != '' and params.endProductDate != null and params.endProductDate != ''"> and product_date between #{params.beginProductDate} and #{params.endProductDate}</if>
+		  </where>
+		  ) t
+		GROUP BY t.product_month
+		ORDER BY t.product_month
+    </select>
+    
+    <select id="selectProductPowerReportByMonth" parameterType="VMesProductPowerDetail" resultMap="VMesProductPowerDetailResult">
+    	<![CDATA[ SELECT mt.date product_month,c.total_power_consume FROM (
+    	SELECT DATE_FORMAT(DATE_ADD(#{params.beginProductDate}, INTERVAL `ROW` MONTH),'%Y-%m') DATE FROM
+		 ( 
+		    SELECT @row := @row + 1 AS `ROW` FROM
+		    (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) t,
+		    (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) t2, 
+		    (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) t3, 
+		    (SELECT @row:=-1) r
+		 ) se
+		 WHERE DATE_FORMAT(DATE_ADD(#{params.beginProductDate}, INTERVAL `ROW` MONTH),'%Y-%m') <= DATE_FORMAT(#{params.endProductDate},'%Y-%m')
+		 ) mt
+    	LEFT JOIN (SELECT
+		  t.product_month,
+		  SUM(t.total_power_consume) total_power_consume
+		FROM
+		  (SELECT
+		    plan_id,
+		    bom_id,
+		    order_id,
+		    DATE_FORMAT(product_date, '%Y-%m') product_month,
+		    material_id,
+		    require_quantity,
+		    product_quantity,
+		    process_id,
+		    product_line_id,
+		    power_consume,
+		    process_name,
+		    total_power_consume,
+		    product_line_name
+		  FROM
+		    `v_mes_product_power_detail`
+		   ]]>
+		  <where> 
+		  	<if test="params.beginProductDate != null and params.beginProductDate != '' and params.endProductDate != null and params.endProductDate != ''"> and product_date between #{params.beginProductDate} and #{params.endProductDate}</if>
+		  </where>
+		  ) t
+			GROUP BY t.product_month
+		) c ON c.product_month = mt.DATE
+		ORDER BY mt.DATE
+    </select>
+    <select id="selectProductPowerReportByYear" parameterType="VMesProductPowerDetail" resultMap="VMesProductPowerDetailResult">
+    	<![CDATA[ SELECT mt.date product_year,c.total_power_consume FROM (
+    	SELECT DATE_FORMAT(DATE_ADD(#{params.beginProductDate}, INTERVAL `ROW` YEAR),'%Y') DATE FROM
+		 ( 
+		    SELECT @row := @row + 1 AS `ROW` FROM
+		    (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) t,
+		    (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) t2, 
+		    (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) t3, 
+		    (SELECT @row:=-1) r
+		 ) se
+		 WHERE DATE_FORMAT(DATE_ADD(#{params.beginProductDate}, INTERVAL `ROW` YEAR),'%Y') <= DATE_FORMAT(#{params.endProductDate},'%Y')
+		 ) mt
+    	LEFT JOIN (SELECT
+		  t.product_year,
+		  SUM(t.total_power_consume) total_power_consume
+		FROM
+		  (SELECT
+		    plan_id,
+		    bom_id,
+		    order_id,
+		    DATE_FORMAT(product_date, '%Y') product_year,
+		    material_id,
+		    require_quantity,
+		    product_quantity,
+		    process_id,
+		    product_line_id,
+		    power_consume,
+		    process_name,
+		    total_power_consume,
+		    product_line_name
+		  FROM
+		    `v_mes_product_power_detail`
+		  ]]>
+		  <where> 
+		  	<if test="params.beginProductDate != null and params.beginProductDate != '' and params.endProductDate != null and params.endProductDate != ''"> and product_date between #{params.beginProductDate} and #{params.endProductDate}</if>
+		  </where>
+		  ) t
+		GROUP BY t.product_year
+		) c ON c.product_year = mt.DATE
+		ORDER BY mt.DATE
+    </select>
+    <select id="selectProductPowerReportByDay" parameterType="VMesProductPowerDetail" resultMap="VMesProductPowerDetailResult">
+    	<![CDATA[ SELECT mt.date product_date,c.total_power_consume FROM (
+    	SELECT DATE_FORMAT(DATE_ADD(#{productDate}, INTERVAL `ROW` DAY),'%Y-%m-%d') DATE FROM
+		 ( 
+		    SELECT @row := @row + 1 AS `ROW` FROM
+		    (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) t,
+		    (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) t2, 
+		    (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) t3, 
+		    (SELECT @row:=-1) r
+		 ) se
+		 WHERE DATE_FORMAT(DATE_ADD(#{productDate}, INTERVAL `ROW` DAY),'%Y-%m-%d') <= DATE_FORMAT(#{productDate},'%Y-%m-%d')
+		 ) mt
+    	LEFT JOIN (SELECT
+		  t.product_date,
+		  SUM(t.total_power_consume) total_power_consume
+		FROM
+		  (SELECT
+		    plan_id,
+		    bom_id,
+		    order_id,
+		    product_date,
+		    material_id,
+		    require_quantity,
+		    product_quantity,
+		    process_id,
+		    product_line_id,
+		    power_consume,
+		    process_name,
+		    total_power_consume,
+		    product_line_name
+		  FROM
+		    `v_mes_product_power_detail`
+		  ]]>
+		  <where> 
+		  	<if test="productDate != null "> and product_date = #{productDate}</if>
+		  </where>
+		  ) t
+		GROUP BY t.product_date
+		ORDER BY t.product_date
+		) c ON c.product_date = mt.DATE
+    </select>
+</mapper>
