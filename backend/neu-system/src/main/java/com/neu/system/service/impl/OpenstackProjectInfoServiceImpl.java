@@ -3,9 +3,9 @@ package com.neu.system.service.impl;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.neu.system.mapper.ProjectInfoMapper;
-import com.neu.system.domain.ProjectInfo;
-import com.neu.system.service.IProjectInfoService;
+import com.neu.system.mapper.OpenstackProjectInfoMapper;
+import com.neu.system.domain.OpenstackProjectInfo;
+import com.neu.system.service.IOpenstackProjectInfoService;
 
 /**
  * 租户信息Service业务层处理
@@ -14,10 +14,10 @@ import com.neu.system.service.IProjectInfoService;
  * @date 2024-09-23
  */
 @Service
-public class ProjectInfoServiceImpl implements IProjectInfoService 
+public class OpenstackProjectInfoServiceImpl implements IOpenstackProjectInfoService
 {
     @Autowired
-    private ProjectInfoMapper projectInfoMapper;
+    private OpenstackProjectInfoMapper openstackProjectInfoMapper;
 
     /**
      * 查询租户信息
@@ -26,45 +26,45 @@ public class ProjectInfoServiceImpl implements IProjectInfoService
      * @return 租户信息
      */
     @Override
-    public ProjectInfo selectProjectInfoById(String projectId)
+    public OpenstackProjectInfo selectProjectInfoById(String projectId)
     {
-        return projectInfoMapper.selectProjectInfoById(projectId);
+        return openstackProjectInfoMapper.selectProjectInfoById(projectId);
     }
 
     /**
      * 查询租户信息列表
      * 
-     * @param projectInfo 租户信息
+     * @param openstackProjectInfo 租户信息
      * @return 租户信息
      */
     @Override
-    public List<ProjectInfo> selectProjectInfoList(ProjectInfo projectInfo)
+    public List<OpenstackProjectInfo> selectProjectInfoList(OpenstackProjectInfo openstackProjectInfo)
     {
-        return projectInfoMapper.selectProjectInfoList(projectInfo);
+        return openstackProjectInfoMapper.selectProjectInfoList(openstackProjectInfo);
     }
 
     /**
      * 新增租户信息
      * 
-     * @param projectInfo 租户信息
+     * @param openstackProjectInfo 租户信息
      * @return 结果
      */
     @Override
-    public int insertProjectInfo(ProjectInfo projectInfo)
+    public int insertProjectInfo(OpenstackProjectInfo openstackProjectInfo)
     {
-        return projectInfoMapper.insertProjectInfo(projectInfo);
+        return openstackProjectInfoMapper.insertProjectInfo(openstackProjectInfo);
     }
 
     /**
      * 修改租户信息
      * 
-     * @param projectInfo 租户信息
+     * @param openstackProjectInfo 租户信息
      * @return 结果
      */
     @Override
-    public int updateProjectInfo(ProjectInfo projectInfo)
+    public int updateProjectInfo(OpenstackProjectInfo openstackProjectInfo)
     {
-        return projectInfoMapper.updateProjectInfo(projectInfo);
+        return openstackProjectInfoMapper.updateProjectInfo(openstackProjectInfo);
     }
 
     /**
@@ -76,7 +76,7 @@ public class ProjectInfoServiceImpl implements IProjectInfoService
     @Override
     public int deleteProjectInfoByIds(String[] projectIds)
     {
-        return projectInfoMapper.deleteProjectInfoByIds(projectIds);
+        return openstackProjectInfoMapper.deleteProjectInfoByIds(projectIds);
     }
 
     /**
@@ -88,6 +88,6 @@ public class ProjectInfoServiceImpl implements IProjectInfoService
     @Override
     public int deleteProjectInfoById(String projectId)
     {
-        return projectInfoMapper.deleteProjectInfoById(projectId);
+        return openstackProjectInfoMapper.deleteProjectInfoById(projectId);
     }
 }

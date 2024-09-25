@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.neu.common.config.NeuConfig;
+import com.neu.system.domain.OpenstackProjectInfo;
 import com.neu.system.service.CommandService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,7 @@ import com.neu.common.annotation.Log;
 import com.neu.common.core.controller.BaseController;
 import com.neu.common.core.domain.AjaxResult;
 import com.neu.common.enums.BusinessType;
-import com.neu.system.domain.ProjectInfo;
-import com.neu.system.service.IProjectInfoService;
+import com.neu.system.service.IOpenstackProjectInfoService;
 import com.neu.common.utils.poi.ExcelUtil;
 import com.neu.common.core.page.TableDataInfo;
 
@@ -38,11 +38,11 @@ import javax.annotation.Resource;
  */
 @Api(tags = {"租户信息"})
 @RestController
-@RequestMapping("/system/project_info")
-public class ProjectInfoController extends BaseController
+@RequestMapping("/system/openstack_project_info")
+public class OpenstackProjectInfoController extends BaseController
 {
     @Autowired
-    private IProjectInfoService projectInfoService;
+    private IOpenstackProjectInfoService projectInfoService;
 
     @Resource
     private CommandService commandService;
@@ -55,13 +55,13 @@ public class ProjectInfoController extends BaseController
     @DynamicResponseParameters(properties = {
 	        @DynamicParameter(name = "total", value = "总记录数"),
             @DynamicParameter(name = "code", value = "状态码，200正确，其他错误"),
-            @DynamicParameter(name = "rows", value = "返回业务数据（数组类型）", dataTypeClass = ProjectInfo.class),
+            @DynamicParameter(name = "rows", value = "返回业务数据（数组类型）", dataTypeClass = OpenstackProjectInfo.class),
             @DynamicParameter(name = "msg", value = "返回消息内容")
     })
-    public TableDataInfo list(ProjectInfo projectInfo)
+    public TableDataInfo list(OpenstackProjectInfo openstackProjectInfo)
     {
         startPage();
-        List<ProjectInfo> list = projectInfoService.selectProjectInfoList(projectInfo);
+        List<OpenstackProjectInfo> list = projectInfoService.selectProjectInfoList(openstackProjectInfo);
         return getDataTable(list);
     }
 
@@ -76,10 +76,10 @@ public class ProjectInfoController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:project_info:export')")
     @Log(title = "租户信息", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public AjaxResult export(ProjectInfo projectInfo)
+    public AjaxResult export(OpenstackProjectInfo openstackProjectInfo)
     {
-        List<ProjectInfo> list = projectInfoService.selectProjectInfoList(projectInfo);
-        ExcelUtil<ProjectInfo> util = new ExcelUtil<ProjectInfo>(ProjectInfo.class);
+        List<OpenstackProjectInfo> list = projectInfoService.selectProjectInfoList(openstackProjectInfo);
+        ExcelUtil<OpenstackProjectInfo> util = new ExcelUtil<OpenstackProjectInfo>(OpenstackProjectInfo.class);
         return util.exportExcel(list, "project_info");
     }
 
@@ -89,7 +89,7 @@ public class ProjectInfoController extends BaseController
     @ApiOperation("获取租户信息详细信息")
     @DynamicResponseParameters(properties = {
             @DynamicParameter(name = "code", value = "状态码，200正确，其他错误"),
-            @DynamicParameter(name = "data", value = "返回业务数据", dataTypeClass = ProjectInfo.class),
+            @DynamicParameter(name = "data", value = "返回业务数据", dataTypeClass = OpenstackProjectInfo.class),
             @DynamicParameter(name = "msg", value = "返回消息内容")
     })
     @GetMapping(value = "/{projectId}")
@@ -109,7 +109,7 @@ public class ProjectInfoController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:project_info:add')")
     @Log(title = "租户信息", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody ProjectInfo projectInfo)
+    public AjaxResult add(@RequestBody OpenstackProjectInfo openstackProjectInfo)
     {
         //访问openstack，获取生成的租户ID，连同其他信息，填入数据库
         String cmd = String.format("ssh %s@%s -p%s " +
@@ -117,16 +117,16 @@ public class ProjectInfoController extends BaseController
                 NeuConfig.getExecUser(),
                 NeuConfig.getExecHost(),
                 NeuConfig.getExecPort(),
-                projectInfo.getProjectName(),
-                projectInfo.getProjectDescription());
+                openstackProjectInfo.getProjectName(),
+                openstackProjectInfo.getProjectDescription());
 
         String res = commandService.executeCommand(cmd);
         if (!res.startsWith("0")){
             return AjaxResult.error(res.split(":")[1]);
         }
         //将OpenStack返回的租户ID填入参数对象，提交给数据库存储
-        projectInfo.setProjectId(res.split(":")[2]);
-        return toAjax(projectInfoService.insertProjectInfo(projectInfo));
+        openstackProjectInfo.setProjectId(res.split(":")[2]);
+        return toAjax(projectInfoService.insertProjectInfo(openstackProjectInfo));
     }
 
     /**
@@ -140,9 +140,9 @@ public class ProjectInfoController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:project_info:edit')")
     @Log(title = "租户信息", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody ProjectInfo projectInfo)
+    public AjaxResult edit(@RequestBody OpenstackProjectInfo openstackProjectInfo)
     {
-        return toAjax(projectInfoService.updateProjectInfo(projectInfo));
+        return toAjax(projectInfoService.updateProjectInfo(openstackProjectInfo));
     }
 
     /**

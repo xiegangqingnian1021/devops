@@ -15,7 +15,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @date 2024-09-23
  */
 @ApiModel("租户信息")
-public class ProjectInfo extends BaseEntity
+public class OpenstackProjectInfo extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 

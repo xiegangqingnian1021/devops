@@ -127,7 +127,7 @@
 </template>
 
 <script>
-import { listProject_info, getProject_info, delProject_info, addProject_info, updateProject_info, exportProject_info } from "@/api/system/project_info";
+import { listProject_info, getProject_info, delProject_info, addProject_info, updateProject_info, exportProject_info } from "@/api/system/openstack_project_info";
 import fa from 'element-ui/src/locale/lang/fa'
 
 export default {
