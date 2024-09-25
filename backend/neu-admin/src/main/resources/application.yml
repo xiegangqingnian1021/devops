@@ -79,11 +79,11 @@ spring:
   # redis 配置
   redis:
     # 本地 地址与端口，
-    host: openstack
-    port: 26379
+    # host: openstack
+    # port: 26379
     # 服务器 地址与端口
-    # host: 192.168.105.100
-    # port: 6379
+    host: 192.168.105.100
+    port: 6379
     # 数据库索引
     database: 12
     # 密码
