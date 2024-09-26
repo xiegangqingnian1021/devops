@@ -125,7 +125,7 @@ public class OpenstackProjectInfoController extends BaseController
             return AjaxResult.error(res.split(":")[1]);
         }
         //将OpenStack返回的租户ID填入参数对象，提交给数据库存储
-        openstackProjectInfo.setProjectId(res.split(":")[2]);
+        openstackProjectInfo.setProjectId(res.split(":")[2].replace("\n",""));
         return toAjax(projectInfoService.insertProjectInfo(openstackProjectInfo));
     }
 
