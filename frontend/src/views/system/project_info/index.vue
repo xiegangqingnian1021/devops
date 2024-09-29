@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <!-- 新增的遮罩层 -->
     <div class="mask" v-if="showMask"
          v-loading="showMask"
          element-loading-text="现在暂停所有操作，且不要刷新页面，耐心等待，预计需要1分钟"
@@ -218,8 +219,8 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
-      this.open = true;
-      this.title = "添加租户信息";
+      this.open = true // 打开对话的弹窗
+      this.title = "添加租户信息"; //给弹窗加上标题信息
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -263,9 +264,10 @@ export default {
         cancelButtonText: "取消",//取消按钮文字更换
         type: "warning",//提示类型  success/info/warning/error
       }).then(() => {
+        //开始删除租户，启动遮罩层
         this.showMask = true;
         delProject_info(projectIds).then(res => {
-          this.showMask = false;
+          this.showMask = false; //网路应答结束，关闭遮罩层
           this.getList();
           this.msgSuccess("删除成功");
         });
