@@ -167,6 +167,13 @@ export default {
       form: {},
       // 表单校验
       rules: {
+        // 当发起新增或修改操作，这两项内容会成为必填项，如果验证不通过，将无法发起新增或修改
+        projectName: [
+          { required: true, message: "项目名称不能为空", trigger: "blur" }
+        ],
+        projectDescription: [
+          { required: true, message: "项目描述不能为空", trigger: "blur" }
+        ]
       },
       //页面遮罩层
       showMask: false,
@@ -236,8 +243,12 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          //表单合法执行操作
           if (this.form.projectId != null) {
+            //租户存在，就执行修改操作
+            this.showMask = true
             updateProject_info(this.form).then(response => {
+              this.showMask = false;
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
@@ -245,6 +256,7 @@ export default {
           } else {
             //启用遮罩，阻止页面的一切操作
             this.showMask = true;
+            //租户ID不存在，一定执行的是新增操作
             addProject_info(this.form).then(response => {
               //停止遮罩，恢复正常
               this.showMask = false;
