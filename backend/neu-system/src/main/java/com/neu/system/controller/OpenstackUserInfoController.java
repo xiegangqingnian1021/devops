@@ -1,6 +1,9 @@
 package com.neu.system.controller;
 
 import java.util.List;
+
+import com.neu.common.config.NeuConfig;
+import com.neu.system.service.CommandService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +27,8 @@ import com.neu.system.service.IOpenstackUserInfoService;
 import com.neu.common.utils.poi.ExcelUtil;
 import com.neu.common.core.page.TableDataInfo;
 
+import javax.annotation.Resource;
+
 /**
  * 用户信息Controller
  * 
@@ -37,6 +42,9 @@ public class OpenstackUserInfoController extends BaseController
 {
     @Autowired
     private IOpenstackUserInfoService openstackUserInfoService;
+
+    @Resource
+    private CommandService commandService;
 
     /**
      * 查询用户信息列表
@@ -102,6 +110,29 @@ public class OpenstackUserInfoController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody OpenstackUserInfo openstackUserInfo)
     {
+        //1.准备创建用户所需要的参数
+        String userName = openstackUserInfo.getUserName();
+        String userPwd = openstackUserInfo.getUserPwd();
+        String userEmail = openstackUserInfo.getUserEmail();
+        //2.准备Linux命令
+        String cmd = String.format("ssh %s@%s -p%s " +
+                "'bash /cmd/openstack-user-create.sh %s %s %s'",
+                NeuConfig.getExecUser(),
+                NeuConfig.getExecHost(),
+                NeuConfig.getExecPort(),
+                userName,
+                userPwd,
+                userEmail
+                );
+        //3.向Linux发起访问获取响应结果
+        String res = commandService.executeCommand(cmd);
+        //4.解析结果提取用户ID
+        if (!res.startsWith("0")){
+            //创建用户失败
+            return AjaxResult.error(res.split(":")[1]);
+        }
+        String userId = res.split(":")[2];
+        openstackUserInfo.setUserId(userId);
         return toAjax(openstackUserInfoService.insertOpenstackUserInfo(openstackUserInfo));
     }
 
