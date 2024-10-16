@@ -114,15 +114,17 @@ public class OpenstackUserInfoController extends BaseController
         String userName = openstackUserInfo.getUserName();
         String userPwd = openstackUserInfo.getUserPwd();
         String userEmail = openstackUserInfo.getUserEmail();
+        String userEnable = openstackUserInfo.getUserEnable()+"";
         //2.准备Linux命令
         String cmd = String.format("ssh %s@%s -p%s " +
-                "'bash /cmd/openstack-user-create.sh %s %s %s'",
+                "'bash /cmd/openstack-user-create.sh %s %s %s %s'",
                 NeuConfig.getExecUser(),
                 NeuConfig.getExecHost(),
                 NeuConfig.getExecPort(),
                 userName,
                 userPwd,
-                userEmail
+                userEmail,
+                userEnable
                 );
         //3.向Linux发起访问获取响应结果
         String res = commandService.executeCommand(cmd);
@@ -131,7 +133,7 @@ public class OpenstackUserInfoController extends BaseController
             //创建用户失败
             return AjaxResult.error(res.split(":")[1]);
         }
-        String userId = res.split(":")[2];
+        String userId = res.split(":")[2].replace("\n","");
         openstackUserInfo.setUserId(userId);
         return toAjax(openstackUserInfoService.insertOpenstackUserInfo(openstackUserInfo));
     }

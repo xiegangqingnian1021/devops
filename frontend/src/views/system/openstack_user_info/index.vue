@@ -114,7 +114,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -133,10 +133,23 @@
           <el-input v-model="form.userEmail" placeholder="请输入用户邮箱" />
         </el-form-item>
         <el-form-item label="登录密码" prop="userPwd">
-          <el-input v-model="form.userPwd" placeholder="请输入登录密码" />
+          <el-input v-model="form.userPwd" placeholder="请输入登录密码" show-password />
         </el-form-item>
         <el-form-item label="是否启用" prop="userEnable">
-          <el-input v-model="form.userEnable" placeholder="请输入是否启用" />
+          <!-- <el-input v-model="form.userEnable" placeholder="请输入是否启用" /> -->
+          <!--
+          弹出式下拉框
+          label 选项名称 是 否
+          value 选项值  1  0
+          -->
+          <el-select v-model="form.userEnable" placeholder="请选择">
+            <el-option
+              v-for="item in commonYesNoList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -156,6 +169,19 @@ export default {
   },
   data() {
     return {
+      // 通用的YesOrNo选项列表对应的数据集
+      commonYesNoList: [
+        //第一个选项
+        {
+          label: "是",
+          value: 1
+        },
+        //第二个选项
+        {
+          label: "否",
+          value: 0
+        }
+      ],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -189,6 +215,16 @@ export default {
       form: {},
       // 表单校验
       rules: {
+        // 当发起新增或修改操作，这两项内容会成为必填项，如果验证不通过，将无法发起新增或修改
+        userName: [
+          { required: true, message: "用户名称不能为空", trigger: "blur" }
+        ],
+        userEmail: [
+          { required: true, message: "用户邮箱不能为空", trigger: "blur" }
+        ],
+        userPwd: [
+          { required: true, message: "登录密码不能为空", trigger: "blur" }
+        ],
       }
     };
   },
@@ -210,7 +246,13 @@ export default {
     },
     // 是否启用字典翻译
     userEnableFormat(row, column) {
-      return this.selectDictLabel(this.userEnableOptions, row.userEnable);
+      //return this.selectDictLabel(this.userEnableOptions, row.userEnable);
+      for (let i=0; i<this.commonYesNoList.length; i++){
+        if (row.userEnable === this.commonYesNoList[i].value){
+          return this.commonYesNoList[i].label
+        }
+      }
+      return "否"
     },
     // 取消按钮
     cancel() {
@@ -249,6 +291,8 @@ export default {
       this.reset();
       this.open = true;
       this.title = "添加用户信息";
+      //在对话框中默认是否启用为 是
+      this.form.userEnable = 1
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
