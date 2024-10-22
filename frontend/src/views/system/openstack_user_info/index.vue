@@ -1,5 +1,10 @@
 <template>
   <div class="app-container">
+    <!-- 新增的遮罩层 -->
+    <div class="mask" v-if="showMask"
+         v-loading="showMask"
+         element-loading-text="现在暂停所有操作，且不要刷新页面，耐心等待，预计需要1分钟"
+         element-loading-spinner="el-icon-loading"></div>
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="用户编号" prop="userId">
         <el-input
@@ -162,6 +167,7 @@
 
 <script>
 import { listOpenstack_user_info, getOpenstack_user_info, delOpenstack_user_info, addOpenstack_user_info, updateOpenstack_user_info, exportOpenstack_user_info } from "@/api/system/openstack_user_info";
+import { delProject_info } from '@/api/system/openstack_project_info'
 
 export default {
   name: "Openstack_user_info",
@@ -169,6 +175,8 @@ export default {
   },
   data() {
     return {
+      // 遮罩层的控制开关
+      showMask: false, //默认不开启遮罩层， 设置为true就开启遮罩层
       // 通用的YesOrNo选项列表对应的数据集
       commonYesNoList: [
         //第一个选项
@@ -307,7 +315,7 @@ export default {
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
-        if (valid) {
+        if (valid) { // 输入验证合法时
           if (this.form.userId != null) {
             updateOpenstack_user_info(this.form).then(response => {
               this.msgSuccess("修改成功");
@@ -315,9 +323,15 @@ export default {
               this.getList();
             });
           } else {
+            //开启遮罩层
+            this.showMask = true;
             addOpenstack_user_info(this.form).then(response => {
+              //关闭遮罩层
+              this.showMask = false;
               this.msgSuccess("新增成功");
+              //将新增用户的对话框关闭
               this.open = false;
+              //重新获取新增用户后的用户列表
               this.getList();
             });
           }
@@ -327,16 +341,25 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const userIds = row.userId || this.ids;
-      this.$confirm('是否确认删除用户信息编号为"' + userIds + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return delOpenstack_user_info(userIds);
-        }).then(() => {
+      this.$confirm('是否确认删除用户信息编号为"' + userIds + '"的数据项?', "提示", {
+        confirmButtonText: "确认",//确认按钮文字更换
+        cancelButtonText: "取消",//取消按钮文字更换
+        type: "warning",//提示类型  success/info/warning/error
+      }).then(() => {
+        //开始删除用户，启动遮罩层
+        this.showMask = true;
+        delOpenstack_user_info(userIds).then(res => {
+          //网络应答结束，关闭遮罩层
+          this.showMask = false;
           this.getList();
           this.msgSuccess("删除成功");
-        })
+        });
+      }).then((data) => {
+        //取消操作
+      }).catch((err) => {
+        //捕获异常
+        console.log(err);
+      });
     },
     /** 导出按钮操作 */
     handleExport() {
@@ -354,3 +377,13 @@ export default {
   }
 };
 </script>
+<style scoped>
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999; /* 确保遮罩层在其他内容之上 */
+}
+</style>

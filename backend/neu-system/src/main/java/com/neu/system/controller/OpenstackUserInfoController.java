@@ -1,5 +1,6 @@
 package com.neu.system.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.neu.common.config.NeuConfig;
@@ -167,6 +168,33 @@ public class OpenstackUserInfoController extends BaseController
 	@DeleteMapping("/{userIds}")
     public AjaxResult remove(@PathVariable String[] userIds)
     {
-        return toAjax(openstackUserInfoService.deleteOpenstackUserInfoByIds(userIds));
+        //1.遍历userID, 准备脚本需要的参数
+        List<String> errorIds = new ArrayList<>();
+        List<String> okIds = new ArrayList<>();
+        for (String userId : userIds){
+            //2.准备Linux命令
+            String cmd = String.format("ssh %s@%s -p%s " +
+                            "'bash /cmd/openstack-user-delete.sh %s'",
+                    NeuConfig.getExecUser(),
+                    NeuConfig.getExecHost(),
+                    NeuConfig.getExecPort(),
+                    userId
+            );
+
+            //3.向Linux发起访问获取响应结果
+            String res = commandService.executeCommand(cmd);
+
+            //4.判定结果是否删除成功
+            if (!res.startsWith("0")){
+                //收集无法删除的用户ID
+                errorIds.add(userId);
+            }else{
+                //5. 删除成功 从数据库删除
+                openstackUserInfoService.deleteOpenstackUserInfoById(userId);
+            }
+
+        }
+        // 将无法删除的ID返回给前端
+        return AjaxResult.success("删除完毕", errorIds);
     }
 }
