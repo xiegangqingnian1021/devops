@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.system.mapper.OpenstackProjectUserMapper">
+    
+    <resultMap type="OpenstackProjectUser" id="OpenstackProjectUserResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="roleName"    column="role_name"    />
+    </resultMap>
+
+    <sql id="selectOpenstackProjectUserVo">
+        select id, user_id, project_id, role_name from openstack_project_user
+    </sql>
+
+    <select id="selectOpenstackProjectUserList" parameterType="OpenstackProjectUser" resultMap="OpenstackProjectUserResult">
+        <include refid="selectOpenstackProjectUserVo"/>
+        <where>  
+            <if test="id != null  and id != ''"> and id = #{id}</if>
+            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
+            <if test="projectId != null  and projectId != ''"> and project_id = #{projectId}</if>
+            <if test="roleName != null  and roleName != ''"> and role_name like concat('%', #{roleName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectOpenstackProjectUserById" parameterType="String" resultMap="OpenstackProjectUserResult">
+        <include refid="selectOpenstackProjectUserVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertOpenstackProjectUser" parameterType="OpenstackProjectUser">
+        insert into openstack_project_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="roleName != null">role_name,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="roleName != null">#{roleName},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOpenstackProjectUser" parameterType="OpenstackProjectUser">
+        update openstack_project_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="roleName != null">role_name = #{roleName},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteOpenstackProjectUserById" parameterType="String">
+        delete from openstack_project_user where id = #{id}
+    </delete>
+
+    <delete id="deleteOpenstackProjectUserByIds" parameterType="String">
+        delete from openstack_project_user where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
