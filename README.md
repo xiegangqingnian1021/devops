@@ -25,10 +25,10 @@ $ echo "192.168.105.10 controller" >> /etc/hosts
 ```
 所有节点永久关闭 selinux，永久关闭 firewalld，永久关闭 NetworkManager
 ```shell
-systemctl stop firewalld; systemctl disable firewalld
-systemctl stop NetworkManager; systemctl disable NetworkManager
-sed -i 's#SELINUX=.*#SELINUX=disabled#g' /etc/selinux/config
-reboot
+$ systemctl stop firewalld; systemctl disable firewalld
+$ systemctl stop NetworkManager; systemctl disable NetworkManager
+$ sed -i 's#SELINUX=.*#SELINUX=disabled#g' /etc/selinux/config
+$ reboot
 ```
 - 配置yum
 
@@ -122,7 +122,7 @@ NTP是否可用，时间是否同步
 在 controller节点 安装
 
 ```shell
-cd /root/
+$ cd /root/
 #安装PackStack
 $ yum -y install openstack-packstack
 #使用PackStack创建应答文件
@@ -132,18 +132,18 @@ $ packstack --gen-answer-file=answer.ini
 - 修改应答文件
 
 ```shell
-sed -i "s#^CONFIG_SWIFT_INSTALL=.*#CONFIG_SWIFT_INSTALL=n#g" answer.ini
-sed -i "s#^CON:FIG_CEILOMETER_INSTALL=.*#CONFIG_CEILOMETER_INSTALL=n#g" answer.ini
-sed -i "s#^CONFIG_AODH_INSTALL=.*#CONFIG_AODH_INSTALL=n#g" answer.ini
-sed -i "s#^CONFIG_GNOCCHI_INSTALL=.*#CONFIG_GNOCCHI_INSTALL=n#g" answer.ini
-sed -i "s#^CONFIG_NTP_SERVERS=.*#CONFIG_NTP_SERVERS=time1.aliyun.com#g" answer.ini
-sed -i "s#^CONFIG_COMPUTE_HOSTS=.*#CONFIG_COMPUTE_HOSTS=192.168.105.10#g" answer.ini
-sed -i "s#^CONFIG_NETWORK_HOSTS=.*#CONFIG_NETWORK_HOSTS=192.168.105.10#g" answer.ini
-sed -i "s#^CONFIG_KEYSTONE_ADMIN_PW=.*#CONFIG_KEYSTONE_ADMIN_PW=123456#g" answer.ini
-sed -i "s#^CONFIG_NEUTRON_ML2_TYPE_DRIVERS=.*#CONFIG_NEUTRON_ML2_TYPE_DRIVERS=flat,vxlan#g" answer.ini
-sed -i "s#^CONFIG_NEUTRON_OVS_BRIDGE_MAPPINGS=.*#CONFIG_NEUTRON_OVS_BRIDGE_MAPPINGS=physnet1:br-ex#g" answer.ini
-sed -i "s#^CONFIG_NEUTRON_OVS_BRIDGE_IFACES=.*#CONFIG_NEUTRON_OVS_BRIDGE_IFACES=br-ex:ens33#g" answer.ini
-sed -i "s#^CONFIG_PROVISION_DEMO=.*#CONFIG_PROVISION_DEMO=n#g" answer.ini
+$ sed -i "s#^CONFIG_SWIFT_INSTALL=.*#CONFIG_SWIFT_INSTALL=n#g" answer.ini
+$ sed -i "s#^CON:FIG_CEILOMETER_INSTALL=.*#CONFIG_CEILOMETER_INSTALL=n#g" answer.ini
+$ sed -i "s#^CONFIG_AODH_INSTALL=.*#CONFIG_AODH_INSTALL=n#g" answer.ini
+$ sed -i "s#^CONFIG_GNOCCHI_INSTALL=.*#CONFIG_GNOCCHI_INSTALL=n#g" answer.ini
+$ sed -i "s#^CONFIG_NTP_SERVERS=.*#CONFIG_NTP_SERVERS=time1.aliyun.com#g" answer.ini
+$ sed -i "s#^CONFIG_COMPUTE_HOSTS=.*#CONFIG_COMPUTE_HOSTS=192.168.105.10#g" answer.ini
+$ sed -i "s#^CONFIG_NETWORK_HOSTS=.*#CONFIG_NETWORK_HOSTS=192.168.105.10#g" answer.ini
+$ sed -i "s#^CONFIG_KEYSTONE_ADMIN_PW=.*#CONFIG_KEYSTONE_ADMIN_PW=123456#g" answer.ini
+$ sed -i "s#^CONFIG_NEUTRON_ML2_TYPE_DRIVERS=.*#CONFIG_NEUTRON_ML2_TYPE_DRIVERS=flat,vxlan#g" answer.ini
+$ sed -i "s#^CONFIG_NEUTRON_OVS_BRIDGE_MAPPINGS=.*#CONFIG_NEUTRON_OVS_BRIDGE_MAPPINGS=physnet1:br-ex#g" answer.ini
+$ sed -i "s#^CONFIG_NEUTRON_OVS_BRIDGE_IFACES=.*#CONFIG_NEUTRON_OVS_BRIDGE_IFACES=br-ex:ens33#g" answer.ini
+$ sed -i "s#^CONFIG_PROVISION_DEMO=.*#CONFIG_PROVISION_DEMO=n#g" answer.ini
 ```
 
 - 安装
@@ -358,4 +358,4 @@ npm run dev
 
 - 2024-11-01 完成用户与租户的角色关联
   - 数据库表`openstack_project_user`
-  - 脚本openstack-project-user-associate.sh
+  - 脚本`openstack-project-user-associate.sh`
