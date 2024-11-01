@@ -344,6 +344,9 @@ $ npm i
 npm run dev
 ```
 
+系统整体架构如下
+<img src='img/framework.png'>
+
 效果如下
 
 <img src='img/dashboard.png'>
