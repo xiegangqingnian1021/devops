@@ -13,16 +13,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectOpenstackUserInfoVo">
-        select user_id, user_name, user_email, user_pwd, user_enable from openstack_user_info
+        select user_info.user_id, user_info.user_name, user_info.user_email, user_info.user_pwd, user_info.user_enable from openstack_user_info user_info
     </sql>
 
     <select id="selectOpenstackUserInfoList" parameterType="OpenstackUserInfo" resultMap="OpenstackUserInfoResult">
         <include refid="selectOpenstackUserInfoVo"/>
         <where>  
-            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
-            <if test="userName != null  and userName != ''"> and user_name like concat('%', #{userName}, '%')</if>
-            <if test="userEmail != null  and userEmail != ''"> and user_email = #{userEmail}</if>
-            <if test="userEnable != null "> and user_enable = #{userEnable}</if>
+            <if test="userId != null  and userId != ''"> and user_info.user_id = #{userId}</if>
+            <if test="userName != null  and userName != ''"> and user_info.user_name like concat('%', #{userName}, '%')</if>
+            <if test="userEmail != null  and userEmail != ''"> and user_info.user_email = #{userEmail}</if>
+            <if test="userEnable != null "> and user_info.user_enable = #{userEnable}</if>
+            <if test="projectId != null "> and user_info.user_id not in (
+                select project_user.user_id from openstack_project_user project_user where project_user.project_id = #{projectId}
+                )
+             </if>
+             <!-- 当pId不为空，代表要查询和租户关联的用户的信息 -->
+            <if test="pId !=null">
+                and user_info.user_id in (
+                select project_user.user_id from openstack_project_user project_user where project_user.project_id = #{pId}
+                )
+            </if>
         </where>
     </select>
     

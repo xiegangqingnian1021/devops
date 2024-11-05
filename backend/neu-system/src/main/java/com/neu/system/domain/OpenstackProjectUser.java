@@ -8,6 +8,8 @@ import com.neu.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.List;
+
 /**
  * 租户用户对象 openstack_project_user
  * 
@@ -74,6 +76,17 @@ public class OpenstackProjectUser extends BaseEntity
     public String getRoleName() 
     {
         return roleName;
+    }
+
+    /** 用户列表 */
+    private List<String> userIds;
+
+    public List<String> getUserIds() {
+        return userIds;
+    }
+
+    public void setUserIds(List<String> userIds) {
+        this.userIds = userIds;
     }
 
     @Override

@@ -97,6 +97,13 @@
             @click="handleDelete(scope.row)"
             v-hasPermi="['system:project_info:remove']"
           >删除</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-connection"
+            @click="handleAssociate(scope.row)"
+            v-hasPermi="['system:openstack_project_user:add']"
+          >绑定成员</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -124,18 +131,39 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 添加或删除租户用户关联关系的对话框 -->
+    <el-dialog :title="associateDialog.title" :visible.sync="associateDialog.open" width="650px" append-to-body>
+      <el-transfer v-model="associateDialog.value" :data="associateDialog.data" :titles="associateDialog.tittles"></el-transfer>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="assiocateDialogSubmit">确 定</el-button>
+        <el-button @click="assiocateDialogCancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { listProject_info, getProject_info, delProject_info, addProject_info, updateProject_info, exportProject_info } from "@/api/system/openstack_project_info";
-import fa from 'element-ui/src/locale/lang/fa'
+import { listOpenstack_user_info } from '@/api/system/openstack_user_info'
+import { addOpenstack_project_user } from '@/api/system/openstack_project_user'
 
 export default {
   name: "Project_info",
   components: {
   },
   data() {
+    const generateData = _ => {
+      const data = [];
+      for (let i = 1; i <= 15; i++) {
+        data.push({
+          key: i,
+          label: `用户 ${ i }`,
+          disabled: i % 4 === 0
+        });
+      }
+      return data;
+    };
     return {
       // 遮罩层
       loading: true,
@@ -177,7 +205,15 @@ export default {
       },
       //页面遮罩层
       showMask: false,
-
+      // 租户用户管理的对话框模型
+      associateDialog: {
+        title: "绑定用户",
+        open: false,
+        data: [],
+        value: [],
+        tittles: ["待选用户","已选用户"],
+        projectId: null
+      }
     };
   },
   created() {
@@ -302,6 +338,95 @@ export default {
         }).then(response => {
           this.download(response.msg);
         })
+    },
+    /** 打开租户用户关联的对话框 */
+    handleAssociate(row) {
+      //将对话框打开
+      this.associateDialog.open = true
+      //获取未与指定租户绑定的用户列表
+      this.getUserList(row.projectId)
+      //设定当前租户
+      this.associateDialog.projectId = row.projectId
+    },
+    /** 获取用户列表，未与当前选定的租户绑定的用户列表 */
+    getUserList(project_id) {
+      listOpenstack_user_info({
+        projectId: project_id
+      }).then(response1 => {
+        // 将未绑定的用户放入穿梭框的左侧框
+        for (let i=0; i<response1.total; i++){
+          this.associateDialog.data.push(
+            {
+              key: response1.rows[i].userId,
+              label: response1.rows[i].userName,
+            }
+          )
+        }
+        // 将租户已经关联的用户数据添加进来
+        listOpenstack_user_info({
+          pId: project_id
+        }).then(response2 => {
+          for (let i=0; i<response2.total; i++){
+            this.associateDialog.value.push(response2.rows[i].userId)
+            this.associateDialog.data.push(
+              {
+                key: response2.rows[i].userId,
+                label: response2.rows[i].userName,
+              }
+            )
+          }
+        })
+      });
+    },
+
+    /** 提交租户用户的关联处理 */
+    assiocateDialogSubmit(){
+      // 开启页面遮罩
+      this.showMask = true;
+      //准备选定的用户列表
+      let userIds = this.associateDialog.value;
+      //准备要关联的租户Id
+      let projectId = this.associateDialog.projectId;
+      // 访问关联接口
+      addOpenstack_project_user(
+        {
+          roleName: "_member_",
+          projectId: projectId,
+          userIds: userIds
+        }
+      ).then(response => {
+        //关闭遮罩层
+        this.showMask = false
+        //绑定租户用户的对话框关闭
+        this.associateDialog.open = false;
+        //清空数据
+        this.associateDialog.data = [];
+        this.associateDialog.value = [];
+        this.associateDialog.projectId = null;
+        //弹出消息
+        this.msgSuccess("绑定成功");
+      }).catch(err => {
+        //关闭遮罩层
+        this.showMask = false
+        //绑定租户用户的对话框关闭
+        this.associateDialog.open = false;
+        //清空数据
+        this.associateDialog.data = [];
+        this.associateDialog.value = [];
+        this.associateDialog.projectId = null;
+        //弹出消息
+        this.msgError("绑定失败")
+      })
+    },
+
+    /** 关闭租户用户的关联对话框 */
+    assiocateDialogCancel(){
+      //关闭对话框
+      this.associateDialog.open = false;
+      // 清空数据
+      this.associateDialog.data = [];
+      this.associateDialog.value = [];
+      this.associateDialog.projectId = null;
     }
   }
 };

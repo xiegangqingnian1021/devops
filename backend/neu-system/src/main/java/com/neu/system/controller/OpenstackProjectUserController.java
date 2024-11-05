@@ -1,6 +1,9 @@
 package com.neu.system.controller;
 
 import java.util.List;
+
+import com.neu.common.config.NeuConfig;
+import com.neu.system.service.CommandService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +27,8 @@ import com.neu.system.service.IOpenstackProjectUserService;
 import com.neu.common.utils.poi.ExcelUtil;
 import com.neu.common.core.page.TableDataInfo;
 
+import javax.annotation.Resource;
+
 /**
  * 租户用户Controller
  * 
@@ -37,6 +42,9 @@ public class OpenstackProjectUserController extends BaseController
 {
     @Autowired
     private IOpenstackProjectUserService openstackProjectUserService;
+
+    @Resource
+    private CommandService commandService;
 
     /**
      * 查询租户用户列表
@@ -102,7 +110,46 @@ public class OpenstackProjectUserController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody OpenstackProjectUser openstackProjectUser)
     {
-        return toAjax(openstackProjectUserService.insertOpenstackProjectUser(openstackProjectUser));
+        //1.准备参数
+        String projectId = openstackProjectUser.getProjectId();
+        List<String> userIds = openstackProjectUser.getUserIds();
+        String roleName = openstackProjectUser.getRoleName();
+
+        for (String userId : userIds){
+            // 检查用户是否已经与租户进行绑定
+            OpenstackProjectUser tmp = new OpenstackProjectUser();
+            tmp.setUserId(userId);
+            tmp.setProjectId(projectId);
+            List<OpenstackProjectUser> selectedData = openstackProjectUserService.selectOpenstackProjectUserList(tmp);
+            if (selectedData.size() > 0){
+                // 用户与租户已经绑定了
+                // 不再做关联处理
+                continue;
+            }
+            //2.构建执行角色绑定的命令
+            String cmd = String.format("ssh %s@%s -p%s " +
+                            "'bash /cmd/openstack-project-user-associate.sh %s %s %s'",
+                    NeuConfig.getExecUser(),
+                    NeuConfig.getExecHost(),
+                    NeuConfig.getExecPort(),
+                    projectId,
+                    userId,
+                    roleName);
+
+            //3.执行cmd,在OpenStack中租户用户的关联关系
+            String res = commandService.executeCommand(cmd);
+
+            //4.判断res的结果
+            if (!res.startsWith("0")){
+                return AjaxResult.error(res);
+            }
+
+            //5.租户与用户关联成功，将数据关系添加到MySQL数据库
+            openstackProjectUser.setId(System.currentTimeMillis()+"");
+            openstackProjectUser.setUserId(userId);
+            openstackProjectUserService.insertOpenstackProjectUser(openstackProjectUser);
+        }
+        return AjaxResult.success();
     }
 
     /**

@@ -10,6 +10,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="projectDescription"    column="project_description"    />
     </resultMap>
 
+
+
     <sql id="selectProjectInfoVo">
         select project_id, project_name, project_description from openstack_project_info
     </sql>
