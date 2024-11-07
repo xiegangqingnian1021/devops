@@ -110,6 +110,35 @@ public class OpenstackProjectUserController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody OpenstackProjectUser openstackProjectUser)
     {
+        // 移除关联关系
+        // 1. 从数据库中取出当前关联的用户ID
+        OpenstackProjectUser projectUser = new OpenstackProjectUser();
+        projectUser.setProjectId(openstackProjectUser.getProjectId());
+        List<OpenstackProjectUser> selectedProjectUserList =  openstackProjectUserService.selectOpenstackProjectUserList(projectUser);
+
+        //2. 遍历这些列表，参照userIds检查，哪些用户ID是要解除关联的
+        for (OpenstackProjectUser item : selectedProjectUserList){
+            //检查用户ID是否不存在已选的用户列表
+            if (!openstackProjectUser.getUserIds().contains(item.getUserId())){
+                // 当前用户已经不在已选用户的列表中，解除关联关系，更新数据库
+                String cmd = String.format("ssh %s@%s -p%s " +
+                                "'bash /cmd/openstack-project-user-disassociate.sh %s %s %s'",
+                        NeuConfig.getExecUser(),
+                        NeuConfig.getExecHost(),
+                        NeuConfig.getExecPort(),
+                        openstackProjectUser.getProjectId(),
+                        item.getUserId(),
+                        item.getRoleName());
+                String res = commandService.executeCommand(cmd);
+                if (!res.startsWith("0")){
+                    return AjaxResult.error(res);
+                }
+                //从数据库解除关联
+                openstackProjectUserService.deleteOpenstackProjectUserById(item.getId());
+            }
+        }
+
+        //添加关联
         //1.准备参数
         String projectId = openstackProjectUser.getProjectId();
         List<String> userIds = openstackProjectUser.getUserIds();
