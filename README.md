@@ -364,3 +364,6 @@ npm run dev
   - 前端 
   - 后端
   - 创建数据库脚本 devops-2024-11-05.sql
+- 2024-11-07 新增租户用户的关联解除-完毕
+  - 脚本 `openstack-project-user-disassociate.sh`
+  - 后端接口 `OpenstackProjectUserController.sh` 增加解除关联逻辑
