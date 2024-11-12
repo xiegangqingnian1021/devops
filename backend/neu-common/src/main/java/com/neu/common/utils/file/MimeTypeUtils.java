@@ -32,7 +32,10 @@ public class MimeTypeUtils
             // 压缩文件
             "rar", "zip", "gz", "bz2",
             // pdf
-            "pdf" };
+            "pdf",
+            // 镜像
+            "qcow2", "img", "iso"
+    };
 
     public static String getExtension(String prefix)
     {

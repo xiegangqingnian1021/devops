@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.system.mapper.OpenstackImageInfoMapper">
+    
+    <resultMap type="OpenstackImageInfo" id="OpenstackImageInfoResult">
+        <result property="imageId"    column="image_id"    />
+        <result property="imageName"    column="image_name"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="diskFormat"    column="disk_format"    />
+        <result property="containerFormat"    column="container_format"    />
+        <result property="minRam"    column="min_ram"    />
+        <result property="minDisk"    column="min_disk"    />
+        <result property="isPrivate"    column="is_private"    />
+        <result property="isProtected"    column="is_protected"    />
+    </resultMap>
+
+    <sql id="selectOpenstackImageInfoVo">
+        select image_id, image_name, project_id, disk_format, container_format, min_ram, min_disk, is_private, is_protected from openstack_image_info
+    </sql>
+
+    <select id="selectOpenstackImageInfoList" parameterType="OpenstackImageInfo" resultMap="OpenstackImageInfoResult">
+        <include refid="selectOpenstackImageInfoVo"/>
+        <where>  
+            <if test="imageId != null  and imageId != ''"> and image_id = #{imageId}</if>
+            <if test="imageName != null  and imageName != ''"> and image_name like concat('%', #{imageName}, '%')</if>
+            <if test="projectId != null  and projectId != ''"> and project_id = #{projectId}</if>
+            <if test="diskFormat != null  and diskFormat != ''"> and disk_format = #{diskFormat}</if>
+            <if test="containerFormat != null  and containerFormat != ''"> and container_format = #{containerFormat}</if>
+            <if test="minRam != null "> and min_ram = #{minRam}</if>
+            <if test="minDisk != null "> and min_disk = #{minDisk}</if>
+            <if test="isPrivate != null "> and is_private = #{isPrivate}</if>
+            <if test="isProtected != null "> and is_protected = #{isProtected}</if>
+        </where>
+    </select>
+    
+    <select id="selectOpenstackImageInfoById" parameterType="String" resultMap="OpenstackImageInfoResult">
+        <include refid="selectOpenstackImageInfoVo"/>
+        where image_id = #{imageId}
+    </select>
+        
+    <insert id="insertOpenstackImageInfo" parameterType="OpenstackImageInfo">
+        insert into openstack_image_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="imageId != null">image_id,</if>
+            <if test="imageName != null">image_name,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="diskFormat != null">disk_format,</if>
+            <if test="containerFormat != null">container_format,</if>
+            <if test="minRam != null">min_ram,</if>
+            <if test="minDisk != null">min_disk,</if>
+            <if test="isPrivate != null">is_private,</if>
+            <if test="isProtected != null">is_protected,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="imageId != null">#{imageId},</if>
+            <if test="imageName != null">#{imageName},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="diskFormat != null">#{diskFormat},</if>
+            <if test="containerFormat != null">#{containerFormat},</if>
+            <if test="minRam != null">#{minRam},</if>
+            <if test="minDisk != null">#{minDisk},</if>
+            <if test="isPrivate != null">#{isPrivate},</if>
+            <if test="isProtected != null">#{isProtected},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOpenstackImageInfo" parameterType="OpenstackImageInfo">
+        update openstack_image_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="imageName != null">image_name = #{imageName},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="diskFormat != null">disk_format = #{diskFormat},</if>
+            <if test="containerFormat != null">container_format = #{containerFormat},</if>
+            <if test="minRam != null">min_ram = #{minRam},</if>
+            <if test="minDisk != null">min_disk = #{minDisk},</if>
+            <if test="isPrivate != null">is_private = #{isPrivate},</if>
+            <if test="isProtected != null">is_protected = #{isProtected},</if>
+        </trim>
+        where image_id = #{imageId}
+    </update>
+
+    <delete id="deleteOpenstackImageInfoById" parameterType="String">
+        delete from openstack_image_info where image_id = #{imageId}
+    </delete>
+
+    <delete id="deleteOpenstackImageInfoByIds" parameterType="String">
+        delete from openstack_image_info where image_id in 
+        <foreach item="imageId" collection="array" open="(" separator="," close=")">
+            #{imageId}
+        </foreach>
+    </delete>
+</mapper>

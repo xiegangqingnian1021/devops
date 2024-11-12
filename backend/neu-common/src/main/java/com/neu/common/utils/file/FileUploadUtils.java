@@ -22,14 +22,14 @@ import com.neu.common.utils.uuid.IdUtils;
 public class FileUploadUtils
 {
     /**
-     * 默认大小 50M
+     * 默认大小 500M
      */
-    public static final long DEFAULT_MAX_SIZE = 50 * 1024 * 1024;
+    public static final long DEFAULT_MAX_SIZE = 50 * 1024 * 1024 * 10;
 
     /**
-     * 默认的文件名最大长度 100
+     * 默认的文件名最大长度 1000
      */
-    public static final int DEFAULT_FILE_NAME_LENGTH = 100;
+    public static final int DEFAULT_FILE_NAME_LENGTH = 1000;
 
     /**
      * 默认上传的地址

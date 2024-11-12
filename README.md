@@ -367,3 +367,11 @@ npm run dev
 - 2024-11-07 新增租户用户的关联解除-完毕
   - 脚本 `openstack-project-user-disassociate.sh`
   - 后端接口 `OpenstackProjectUserController.sh` 增加解除关联逻辑
+
+- 2024-11-12 新增镜像管理-新增镜像-脚本-数据库-低代码-接口
+  - 脚本 `openstack-image-create.sh`
+  - 后端接口 `OpenstackImageInfoController.java`
+  - 前端页面-低代码初始化页面
+    - `openstack_image_info.js`
+    - `openstack_image_info/index.vue`
+  - 数据库更新 `devops-2024-11-12.sql`

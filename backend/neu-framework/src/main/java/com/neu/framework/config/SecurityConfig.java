@@ -37,7 +37,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             , "/bid/policylaw/front/list", "/bid/policylaw/front/{id}", "/bid/complaint/front/list", "/bid/complaint/front/{id}"
             , "/bid/enterprise/front/{id}", "/system/dict/data/type/", "bid/enterprise/front/edit", "/system/dict/data/type/front/{dictType}"
             , "/bid/enterprise/bidding/front/add", "/bid/enterprise/bidding/front/list", "/bid/enterprise/bidding/front/{id}"
-            , "/bid/enterprise/bidding/front/edit", "/bid/complaint/front/add"};
+            , "/bid/enterprise/bidding/front/edit", "/bid/complaint/front/add",
+            "/common/upload" //设置上传接口允许访问
+    };
     /**
      * 自定义用户认证逻辑
      */
