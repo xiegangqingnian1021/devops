@@ -115,6 +115,22 @@ public class OpenstackImageInfoController extends BaseController {
         Long isPrivate = openstackImageInfo.getIsPrivate(); //是否私有 0 公共 1 私有 默认 0
         Long isProtected = openstackImageInfo.getIsProtected(); //是否受保护 0 不受保护 1 受保护 默认0
         String imagePath = openstackImageInfo.getImagePath(); //镜像路径 ，这里需要先通过上传接口上传镜像
+        // 将imagePath改为绝对路径
+        imagePath = imagePath.replace("/profile", NeuConfig.getProfile());
+
+        // 取出镜像扩展名
+        String[] tmp = imagePath.split("\\.");
+        String imagePrefix = tmp[tmp.length - 1];
+        String openStackImagePath = "/root/"+System.currentTimeMillis()+"."+imagePrefix;
+        // 执行上传
+        String cmdScp = String.format("scp -P%s %s %s@%s:%s &> /dev/null",
+                NeuConfig.getExecPort(),
+                imagePath,
+                NeuConfig.getExecUser(),
+                NeuConfig.getExecHost(),
+                openStackImagePath);
+        commandService.executeCommand(cmdScp);
+
         // 2.构建CMD
         String cmd = String.format("ssh %s@%s -p%s " +
                         "'bash /cmd/openstack-image-create.sh %s %s %s %s %s %s %s %s %s'",
@@ -129,7 +145,7 @@ public class OpenstackImageInfoController extends BaseController {
                 minDisk,
                 isPrivate,
                 isProtected,
-                imagePath
+                openStackImagePath
         );
         // 3.执行创建
         String res = commandService.executeCommand(cmd);
