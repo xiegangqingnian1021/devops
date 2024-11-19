@@ -28,8 +28,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="projectId != null  and projectId != ''"> and project_id = #{projectId}</if>
             <if test="diskFormat != null  and diskFormat != ''"> and disk_format = #{diskFormat}</if>
             <if test="containerFormat != null  and containerFormat != ''"> and container_format = #{containerFormat}</if>
-            <if test="minRam != null "> and min_ram = #{minRam}</if>
-            <if test="minDisk != null "> and min_disk = #{minDisk}</if>
+            <if test="minRam != 0 "> and min_ram = #{minRam}</if>
+            <if test="minDisk != 0 "> and min_disk = #{minDisk}</if>
             <if test="isPrivate != null "> and is_private = #{isPrivate}</if>
             <if test="isProtected != null "> and is_protected = #{isProtected}</if>
         </where>

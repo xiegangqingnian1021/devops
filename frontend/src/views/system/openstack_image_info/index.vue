@@ -1,5 +1,9 @@
 <template>
   <div class="app-container">
+    <div class="mask" v-if="showMask"
+         v-loading="showMask"
+         element-loading-text="现在暂停所有操作，且不要刷新页面，耐心等待，预计需要1分钟"
+         element-loading-spinner="el-icon-loading"></div>
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="镜像ID" prop="imageId">
         <el-input
@@ -20,6 +24,7 @@
         />
       </el-form-item>
       <el-form-item label="所属租户" prop="projectId">
+        <!--
         <el-input
           v-model="queryParams.projectId"
           placeholder="请输入所属租户"
@@ -27,8 +32,18 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
+        -->
+        <el-select v-model="queryParams.projectId" placeholder="请选择">
+          <el-option
+            v-for="item in project_infoList"
+            :key="item.projectId"
+            :label="item.projectName"
+            :value="item.projectId">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="磁盘格式" prop="diskFormat">
+        <!--
         <el-input
           v-model="queryParams.diskFormat"
           placeholder="请输入磁盘格式"
@@ -36,8 +51,18 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
+        -->
+        <el-select v-model="queryParams.diskFormat" placeholder="请选择">
+          <el-option
+            v-for="item in [{key: 'qcow2', label: 'qcow2', value: 'qcow2'},{key: 'iso', label: 'iso', value: 'iso'}]"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="容器格式" prop="containerFormat">
+        <!--
         <el-input
           v-model="queryParams.containerFormat"
           placeholder="请输入容器格式"
@@ -45,8 +70,18 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
+        -->
+        <el-select v-model="queryParams.containerFormat" placeholder="请选择">
+          <el-option
+            v-for="item in [{key: 'bare', label: 'bare', value: 'bare'},{key: 'ovf', label: 'ovf', value: 'ovf'}]"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="最小内存" prop="minRam">
+        <!--
         <el-input
           v-model="queryParams.minRam"
           placeholder="请输入最小内存"
@@ -54,8 +89,11 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
+        -->
+        <el-input-number v-model="queryParams.minRam" @change="handleChange1" :min="0" :max="1024" label="描述文字"/>
       </el-form-item>
       <el-form-item label="最小硬盘" prop="minDisk">
+        <!--
         <el-input
           v-model="queryParams.minDisk"
           placeholder="请输入最小硬盘"
@@ -63,8 +101,11 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
+        -->
+        <el-input-number v-model="queryParams.minDisk" @change="handleChange2" :min="0" :max="1024" label="描述文字"/>
       </el-form-item>
       <el-form-item label="是否私有" prop="isPrivate">
+        <!--
         <el-input
           v-model="queryParams.isPrivate"
           placeholder="请输入是否私有"
@@ -72,8 +113,18 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
+        -->
+        <el-select v-model="queryParams.isPrivate" placeholder="请选择">
+          <el-option
+            v-for="item in [{key: 0, label: '否', value: 0},{key: 1, label: '是', value: 1}]"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="是否保护" prop="isProtected">
+        <!--
         <el-input
           v-model="queryParams.isProtected"
           placeholder="请输入是否保护"
@@ -81,6 +132,15 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
+        -->
+        <el-select v-model="queryParams.isProtected" placeholder="请选择">
+          <el-option
+            v-for="item in [{key: 0, label: '否', value: 0},{key: 1, label: '是', value: 1}]"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -256,6 +316,8 @@ import { listOpenstack_image_info, getOpenstack_image_info, delOpenstack_image_i
 import FileUpload from '@/components/FileUpload/index.vue'
 import row from 'element-ui/packages/row'
 import ro from 'element-ui/src/locale/lang/ro'
+import { listProject_info } from '@/api/system/openstack_project_info'
+import fa from 'element-ui/src/locale/lang/fa'
 export default {
   name: "Openstack_image_info",
   computed: {
@@ -304,13 +366,31 @@ export default {
       form: {},
       // 表单校验
       rules: {
-      }
+        imageName: [
+          { required: true, message: "镜像名不能为空", trigger: "blur" }
+        ],
+        projectId: [
+          { required: true, message: "租户不能为空", trigger: "blur" }
+        ]
+      },
+      //租户列表
+      project_infoList: null,
+      //页面遮罩层
+      showMask: false
     };
   },
   created() {
+    // 当前页面被加载时，调用的函数
     this.getList();
+    this.getProjectList();
   },
   methods: {
+    /** 获取所有租户 */
+    getProjectList() {
+      listProject_info({}).then(response => {
+        this.project_infoList = response.rows;
+      });
+    },
     /** 内存要求的改变 */
     handleChange1(value){
       this.form.minRam = value
@@ -405,7 +485,9 @@ export default {
               this.getList();
             });
           } else {
+            this.showMask = true;
             addOpenstack_image_info(this.form).then(response => {
+              this.showMask = false;
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -480,3 +562,13 @@ export default {
   }
 };
 </script>
+<style scoped>
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999; /* 确保遮罩层在其他内容之上 */
+}
+</style>
