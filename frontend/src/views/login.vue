@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
-      <h3 class="title">双碳管理系统</h3>
+      <h3 class="title">自动化运维平台</h3>
       <el-form-item prop="username">
         <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
@@ -48,7 +48,7 @@
     </el-form>
     <!--  底部  -->
     <div class="el-login-footer">
-      <span>Copyright © 2018-2022 东软集团股份有限公司 All Rights Reserved.</span>
+      <span>Copyright © 2023-2024 XXXX有限公司 All Rights Reserved.</span>
     </div>
   </div>
 </template>

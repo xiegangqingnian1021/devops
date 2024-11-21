@@ -316,7 +316,7 @@ import { listOpenstack_image_info, getOpenstack_image_info, delOpenstack_image_i
 import FileUpload from '@/components/FileUpload/index.vue'
 import row from 'element-ui/packages/row'
 import ro from 'element-ui/src/locale/lang/ro'
-import { listProject_info } from '@/api/system/openstack_project_info'
+import { delProject_info, listProject_info } from '@/api/system/openstack_project_info'
 import fa from 'element-ui/src/locale/lang/fa'
 export default {
   name: "Openstack_image_info",
@@ -500,15 +500,23 @@ export default {
     handleDelete(row) {
       const imageIds = row.imageId || this.ids;
       this.$confirm('是否确认删除镜像信息编号为"' + imageIds + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return delOpenstack_image_info(imageIds);
-        }).then(() => {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        //开始删除镜像，启动遮罩层
+        this.showMask = true;
+        delOpenstack_image_info(imageIds).then(res => {
+          this.showMask = false; //网路应答结束，关闭遮罩层
           this.getList();
           this.msgSuccess("删除成功");
-        })
+        });
+      }).then((data) => {
+        //取消操作
+      }).catch((err) => {
+        //捕获异常
+        console.log(err);
+      });
     },
     /** 导出按钮操作 */
     handleExport() {

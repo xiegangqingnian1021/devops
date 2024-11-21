@@ -187,6 +187,19 @@ public class OpenstackImageInfoController extends BaseController {
     @Log(title = "镜像信息", businessType = BusinessType.DELETE)
     @DeleteMapping("/{imageIds}")
     public AjaxResult remove(@PathVariable String[] imageIds) {
-        return toAjax(openstackImageInfoService.deleteOpenstackImageInfoByIds(imageIds));
+        for (String imageId : imageIds){
+            String cmd = String.format("ssh %s@%s -p%s " +
+                            "'bash /cmd/openstack-image-delete.sh %s'",
+                    NeuConfig.getExecUser(),
+                    NeuConfig.getExecHost(),
+                    NeuConfig.getExecPort(),
+                    imageId);
+            String res = commandService.executeCommand(cmd);
+            if (res.startsWith("1") || res.startsWith("2")){
+                return AjaxResult.error(res);
+            }
+            openstackImageInfoService.deleteOpenstackImageInfoById(imageId);
+        }
+        return AjaxResult.success();
     }
 }

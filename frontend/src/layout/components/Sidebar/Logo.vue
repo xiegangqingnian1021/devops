@@ -35,7 +35,7 @@ export default {
   },
   data() {
     return {
-      title: '双碳管理系统',
+      title: '自动化运维平台',
       logo: logoImg
     }
   }
