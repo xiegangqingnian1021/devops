@@ -375,3 +375,7 @@ npm run dev
     - `openstack_image_info.js`
     - `openstack_image_info/index.vue`
   - 数据库更新 `devops-2024-11-12.sql`
+- 2024-12-02 新增网络管理
+  - 脚本
+  - 接口
+  - ui

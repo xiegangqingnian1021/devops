@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.system.mapper.OpenstackNetworkInfoMapper">
+    
+    <resultMap type="OpenstackNetworkInfo" id="OpenstackNetworkInfoResult">
+        <result property="networkId"    column="network_id"    />
+        <result property="networkName"    column="network_name"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="isInternal"    column="is_internal"    />
+    </resultMap>
+
+    <sql id="selectOpenstackNetworkInfoVo">
+        select network_id, network_name, project_id, is_internal from openstack_network_info
+    </sql>
+
+    <select id="selectOpenstackNetworkInfoList" parameterType="OpenstackNetworkInfo" resultMap="OpenstackNetworkInfoResult">
+        <include refid="selectOpenstackNetworkInfoVo"/>
+        <where>  
+            <if test="networkId != null  and networkId != ''"> and network_id = #{networkId}</if>
+            <if test="networkName != null  and networkName != ''"> and network_name like concat('%', #{networkName}, '%')</if>
+            <if test="projectId != null  and projectId != ''"> and project_id = #{projectId}</if>
+            <if test="isInternal != null "> and is_internal = #{isInternal}</if>
+        </where>
+    </select>
+    
+    <select id="selectOpenstackNetworkInfoById" parameterType="String" resultMap="OpenstackNetworkInfoResult">
+        <include refid="selectOpenstackNetworkInfoVo"/>
+        where network_id = #{networkId}
+    </select>
+        
+    <insert id="insertOpenstackNetworkInfo" parameterType="OpenstackNetworkInfo">
+        insert into openstack_network_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="networkId != null">network_id,</if>
+            <if test="networkName != null">network_name,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="isInternal != null">is_internal,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="networkId != null">#{networkId},</if>
+            <if test="networkName != null">#{networkName},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="isInternal != null">#{isInternal},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOpenstackNetworkInfo" parameterType="OpenstackNetworkInfo">
+        update openstack_network_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="networkName != null">network_name = #{networkName},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="isInternal != null">is_internal = #{isInternal},</if>
+        </trim>
+        where network_id = #{networkId}
+    </update>
+
+    <delete id="deleteOpenstackNetworkInfoById" parameterType="String">
+        delete from openstack_network_info where network_id = #{networkId}
+    </delete>
+
+    <delete id="deleteOpenstackNetworkInfoByIds" parameterType="String">
+        delete from openstack_network_info where network_id in 
+        <foreach item="networkId" collection="array" open="(" separator="," close=")">
+            #{networkId}
+        </foreach>
+    </delete>
+</mapper>
