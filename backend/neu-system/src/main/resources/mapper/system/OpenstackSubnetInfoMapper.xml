@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.system.mapper.OpenstackSubnetInfoMapper">
+    
+    <resultMap type="OpenstackSubnetInfo" id="OpenstackSubnetInfoResult">
+        <result property="subnetId"    column="subnet_id"    />
+        <result property="subnetName"    column="subnet_name"    />
+        <result property="networkId"    column="network_id"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="subnetRange"    column="subnet_range"    />
+        <result property="gateway"    column="gateway"    />
+    </resultMap>
+
+    <sql id="selectOpenstackSubnetInfoVo">
+        select subnet_id, subnet_name, network_id, project_id, subnet_range, gateway from openstack_subnet_info
+    </sql>
+
+    <select id="selectOpenstackSubnetInfoList" parameterType="OpenstackSubnetInfo" resultMap="OpenstackSubnetInfoResult">
+        <include refid="selectOpenstackSubnetInfoVo"/>
+        <where>  
+            <if test="subnetId != null  and subnetId != ''"> and subnet_id = #{subnetId}</if>
+            <if test="subnetName != null  and subnetName != ''"> and subnet_name like concat('%', #{subnetName}, '%')</if>
+            <if test="networkId != null  and networkId != ''"> and network_id = #{networkId}</if>
+            <if test="projectId != null  and projectId != ''"> and project_id = #{projectId}</if>
+        </where>
+    </select>
+    
+    <select id="selectOpenstackSubnetInfoById" parameterType="String" resultMap="OpenstackSubnetInfoResult">
+        <include refid="selectOpenstackSubnetInfoVo"/>
+        where subnet_id = #{subnetId}
+    </select>
+        
+    <insert id="insertOpenstackSubnetInfo" parameterType="OpenstackSubnetInfo">
+        insert into openstack_subnet_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="subnetId != null">subnet_id,</if>
+            <if test="subnetName != null">subnet_name,</if>
+            <if test="networkId != null">network_id,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="subnetRange != null">subnet_range,</if>
+            <if test="gateway != null">gateway,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="subnetId != null">#{subnetId},</if>
+            <if test="subnetName != null">#{subnetName},</if>
+            <if test="networkId != null">#{networkId},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="subnetRange != null">#{subnetRange},</if>
+            <if test="gateway != null">#{gateway},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOpenstackSubnetInfo" parameterType="OpenstackSubnetInfo">
+        update openstack_subnet_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="subnetName != null">subnet_name = #{subnetName},</if>
+            <if test="networkId != null">network_id = #{networkId},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="subnetRange != null">subnet_range = #{subnetRange},</if>
+            <if test="gateway != null">gateway = #{gateway},</if>
+        </trim>
+        where subnet_id = #{subnetId}
+    </update>
+
+    <delete id="deleteOpenstackSubnetInfoById" parameterType="String">
+        delete from openstack_subnet_info where subnet_id = #{subnetId}
+    </delete>
+
+    <delete id="deleteOpenstackSubnetInfoByIds" parameterType="String">
+        delete from openstack_subnet_info where subnet_id in 
+        <foreach item="subnetId" collection="array" open="(" separator="," close=")">
+            #{subnetId}
+        </foreach>
+    </delete>
+</mapper>
