@@ -154,25 +154,25 @@
         <el-form-item label="子网名称" prop="subnetName">
           <el-input v-model="form.subnetName" placeholder="请输入子网名称" />
         </el-form-item>
-        <el-form-item label="所属网络" prop="networkId">
-          <!-- <el-input v-model="form.networkId" placeholder="请输入所属网络" /> -->
-          <el-select v-model="form.networkId" placeholder="请选择所属网络">
-            <el-option
-              v-for="item in network_infoList"
-              :key="item.networkId"
-              :label="item.networkName"
-              :value="item.networkId">
-            </el-option>
-          </el-select>
-        </el-form-item>
         <el-form-item label="所属租户" prop="projectId">
           <!-- <el-input v-model="form.projectId" placeholder="请输入所属租户" /> -->
-          <el-select v-model="form.projectId" placeholder="请选择所属租户">
+          <el-select v-model="form.projectId" placeholder="请选择所属租户" @change="getSelectNetworkList">
             <el-option
               v-for="item in project_infoList"
               :key="item.projectId"
               :label="item.projectName"
               :value="item.projectId">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="所属网络" prop="networkId">
+          <!-- <el-input v-model="form.networkId" placeholder="请输入所属网络" /> -->
+          <el-select v-model="form.networkId" placeholder="请选择所属网络">
+            <el-option
+              v-for="item in select_network_infoList"
+              :key="item.networkId"
+              :label="item.networkName"
+              :value="item.networkId">
             </el-option>
           </el-select>
         </el-form-item>
@@ -239,7 +239,9 @@ export default {
       // 租户列表
       project_infoList: null,
       // 页面遮罩层
-      showMask: false
+      showMask: false,
+      // 筛选出的网络列表
+      select_network_infoList: null
     };
   },
   created() {
@@ -361,6 +363,14 @@ export default {
       listNetwork_info({}).then(response => {
         this.network_infoList = response.rows;
 
+      });
+    },
+    /** 根据租户查询网络列表 */
+    getSelectNetworkList() {
+      listNetwork_info({
+        projectId: this.form.projectId
+      }).then(response => {
+        this.select_network_infoList = response.rows;
       });
     },
 
