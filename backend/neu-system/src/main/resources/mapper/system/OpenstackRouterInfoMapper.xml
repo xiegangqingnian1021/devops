@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.system.mapper.OpenstackRouterInfoMapper">
+    
+    <resultMap type="OpenstackRouterInfo" id="OpenstackRouterInfoResult">
+        <result property="routerId"    column="router_id"    />
+        <result property="routerName"    column="router_name"    />
+        <result property="routerDescription"    column="router_description"    />
+        <result property="projectId"    column="project_id"    />
+    </resultMap>
+
+    <sql id="selectOpenstackRouterInfoVo">
+        select router_id, router_name, router_description, project_id from openstack_router_info
+    </sql>
+
+    <select id="selectOpenstackRouterInfoList" parameterType="OpenstackRouterInfo" resultMap="OpenstackRouterInfoResult">
+        <include refid="selectOpenstackRouterInfoVo"/>
+        <where>  
+            <if test="routerId != null  and routerId != ''"> and router_id = #{routerId}</if>
+            <if test="routerName != null  and routerName != ''"> and router_name like concat('%', #{routerName}, '%')</if>
+            <if test="projectId != null  and projectId != ''"> and project_id = #{projectId}</if>
+        </where>
+    </select>
+    
+    <select id="selectOpenstackRouterInfoById" parameterType="String" resultMap="OpenstackRouterInfoResult">
+        <include refid="selectOpenstackRouterInfoVo"/>
+        where router_id = #{routerId}
+    </select>
+        
+    <insert id="insertOpenstackRouterInfo" parameterType="OpenstackRouterInfo">
+        insert into openstack_router_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="routerId != null">router_id,</if>
+            <if test="routerName != null">router_name,</if>
+            <if test="routerDescription != null">router_description,</if>
+            <if test="projectId != null">project_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="routerId != null">#{routerId},</if>
+            <if test="routerName != null">#{routerName},</if>
+            <if test="routerDescription != null">#{routerDescription},</if>
+            <if test="projectId != null">#{projectId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOpenstackRouterInfo" parameterType="OpenstackRouterInfo">
+        update openstack_router_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="routerName != null">router_name = #{routerName},</if>
+            <if test="routerDescription != null">router_description = #{routerDescription},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+        </trim>
+        where router_id = #{routerId}
+    </update>
+
+    <delete id="deleteOpenstackRouterInfoById" parameterType="String">
+        delete from openstack_router_info where router_id = #{routerId}
+    </delete>
+
+    <delete id="deleteOpenstackRouterInfoByIds" parameterType="String">
+        delete from openstack_router_info where router_id in 
+        <foreach item="routerId" collection="array" open="(" separator="," close=")">
+            #{routerId}
+        </foreach>
+    </delete>
+</mapper>

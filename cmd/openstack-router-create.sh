@@ -19,7 +19,7 @@ fi
 
 # 3.创建路由器
 ## res将保存路由器的id
-res=$(openstack router create --enable --project ${project_id} ${router_name} --format value --column id)
+res=$(openstack router create --enable --description ${router_description} --project ${project_id} ${router_name} --format value --column id)
 if [ $? -ne 0 ]; then
   echo "3:路由器创建失败:${res}"
   exit
