@@ -90,7 +90,7 @@
       <el-table-column label="路由编号" align="center" prop="routerId" />
       <el-table-column label="路由名称" align="center" prop="routerName" />
       <el-table-column label="路由介绍" align="center" prop="routerDescription" />
-      <el-table-column label="租户编号" align="center" prop="projectId" />
+      <el-table-column label="所属租户" align="center" prop="projectId" :formatter="showProjectName" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -107,6 +107,20 @@
             @click="handleDelete(scope.row)"
             v-hasPermi="['system:openstack_router_info:remove']"
           >删除</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-set-up"
+            @click="handleGateway(scope.row)"
+            v-hasPermi="['system:openstack_router_interface:add']"
+          >设置网关</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-s-operation"
+            @click="handleSubnet(scope.row)"
+            v-hasPermi="['system:openstack_router_interface:add']"
+          >设置内网</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -145,13 +159,63 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 添加或修改路由接口对话框 -->
+    <el-dialog :title="gatewayDialog.title" :visible.sync="gatewayDialog.open" width="500px" append-to-body>
+      <el-form ref="gatewayDialog_form" :model="gatewayDialog.form" :rules="gatewayDialog.rules" label-width="80px">
+        <el-form-item label="所属租户" prop="projectId">
+          <el-input v-model="gatewayDialog.form.projectId" readonly />
+        </el-form-item>
+        <el-form-item label="所属路由" prop="routerId">
+          <el-input v-model="gatewayDialog.form.routerId" readonly />
+        </el-form-item>
+        <el-form-item label="网络编号" prop="netId">
+          <el-input v-model="gatewayDialog.form.netId" placeholder="请输入网络编号" />
+        </el-form-item>
+        <el-form-item label="所属用户" prop="userName">
+          <el-input v-model="gatewayDialog.form.userName" placeholder="请输入用户名" />
+        </el-form-item>
+        <el-form-item label="身份密码" prop="userPwd">
+          <el-input v-model="gatewayDialog.form.userPwd" placeholder="请输入密码" show-password />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="gatewayDialog_submitForm">确 定</el-button>
+        <el-button @click="gatewayDialog_cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 设置路内网的对话框 -->
+    <el-dialog :title="subnetDialog.title" :visible.sync="subnetDialog.open" width="500px" append-to-body>
+      <el-form ref="subnetDialog_form" :model="subnetDialog.form" :rules="subnetDialog.rules" label-width="80px">
+        <el-form-item label="所属租户" prop="projectId">
+          <el-input v-model="subnetDialog.form.projectId" readonly />
+        </el-form-item>
+        <el-form-item label="所属路由" prop="routerId">
+          <el-input v-model="subnetDialog.form.routerId" readonly />
+        </el-form-item>
+        <el-form-item label="子网编号" prop="netId">
+          <el-input v-model="subnetDialog.form.netId" placeholder="请输入网络编号" />
+        </el-form-item>
+        <el-form-item label="所属用户" prop="userName">
+          <el-input v-model="subnetDialog.form.userName" placeholder="请输入用户名" />
+        </el-form-item>
+        <el-form-item label="身份密码" prop="userPwd">
+          <el-input v-model="subnetDialog.form.userPwd" placeholder="请输入密码" show-password />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="subnetDialog_submitForm">确 定</el-button>
+        <el-button @click="subnetDialog_cancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { listOpenstack_router_info, getOpenstack_router_info, delOpenstack_router_info, addOpenstack_router_info, updateOpenstack_router_info, exportOpenstack_router_info } from "@/api/system/openstack_router_info";
 import { listProject_info } from '@/api/system/openstack_project_info'
-import fa from 'element-ui/src/locale/lang/fa'
+import { addOpenstack_router_interface } from '@/api/system/openstack_router_interface'
 
 export default {
   name: "Openstack_router_info",
@@ -193,7 +257,31 @@ export default {
       // 租户列表
       project_infoList: null,
       // 页面遮罩
-      showMask: false
+      showMask: false,
+      // 网关对话框数据模型
+      gatewayDialog: {
+        // 弹出层标题
+        title: "",
+        // 是否显示弹出层
+        open: false,
+        // 表单参数
+        form: {},
+        // 表单校验
+        rules: {
+        }
+      },
+      // 内网对话框数据模型
+      subnetDialog: {
+        // 弹出层标题
+        title: "",
+        // 是否显示弹出层
+        open: false,
+        // 表单参数
+        form: {},
+        // 表单校验
+        rules: {
+        }
+      },
     };
   },
   created() {
@@ -312,6 +400,122 @@ export default {
       listProject_info({}).then(response => {
         this.project_infoList = response.rows;
       });
+    },
+
+    /** 显示租户名称 */
+    showProjectName(row){
+      for (let i=0; i<this.project_infoList.length; i++){
+        if (row.projectId === this.project_infoList[i].projectId){
+          return this.project_infoList[i].projectName
+        }
+      }
+      return row.projectId
+    },
+
+    /** 打开设置网关 */
+    handleGateway(row) {
+      this.gatewayDialog_reset()
+      this.gatewayDialog.form.projectName = this.showProjectName(row);
+      this.gatewayDialog.form.projectId = row.projectId + ":" + this.gatewayDialog.form.projectName;
+      this.gatewayDialog.form.routerId = row.routerId + ":" + row.routerName;
+      this.gatewayDialog.form.isGateway = 1;
+      this.gatewayDialog.open = true;
+      this.gatewayDialog.title = "添加网关";
+    },
+
+    // 设置网关的表单重置
+    gatewayDialog_reset() {
+      this.gatewayDialog.form = {
+        id: null,
+        routerId: null,
+        isGateway: null,
+        netId: null,
+        userName: null,
+        userPwd: null,
+        projectId: null,
+        projectName: null
+      };
+      this.resetForm("gatewayDialog_form");
+    },
+
+    /** 提交网关设置 */
+    gatewayDialog_submitForm() {
+      this.$refs["gatewayDialog_form"].validate(valid => {
+        if (valid) {
+          if (this.gatewayDialog.form.id != null) {
+            updateOpenstack_router_interface(this.form).then(response => {
+              this.msgSuccess("修改网关成功");
+              this.gatewayDialog.open = false;
+              this.getList();
+            });
+          } else {
+            addOpenstack_router_interface(this.gatewayDialog.form).then(response => {
+              this.msgSuccess("设置网关成功");
+              this.gatewayDialog.open = false;
+              this.getList();
+            });
+          }
+        }
+      });
+    },
+
+    /** 取消设置网关 */
+    gatewayDialog_cancel() {
+      this.gatewayDialog.open = false;
+      this.gatewayDialog_reset();
+    },
+
+    /** 打开设置网关 */
+    handleSubnet(row) {
+      this.subnetDialog_reset()
+      this.subnetDialog.form.projectName = this.showProjectName(row);
+      this.subnetDialog.form.projectId = row.projectId + ":" + this.subnetDialog.form.projectName;
+      this.subnetDialog.form.routerId = row.routerId + ":" + row.routerName;
+      this.subnetDialog.form.isGateway = 0;
+      this.subnetDialog.open = true;
+      this.subnetDialog.title = "添加内网";
+    },
+
+    // 设置内网的表单重置
+    subnetDialog_reset() {
+      this.subnetDialog.form = {
+        id: null,
+        routerId: null,
+        isGateway: null,
+        netId: null,
+        userName: null,
+        userPwd: null,
+        projectId: null,
+        projectName: null
+      };
+      this.resetForm("subnetDialog_form");
+    },
+
+    /** 提交内网设置 */
+    subnetDialog_submitForm() {
+      this.$refs["subnetDialog_form"].validate(valid => {
+        if (valid) {
+          if (this.subnetDialog.form.id != null) {
+            updateOpenstack_router_interface(this.subnetDialog.form).then(response => {
+              this.msgSuccess("修改内网成功");
+              this.subnetDialog.open = false;
+              this.getList();
+            });
+          } else {
+            addOpenstack_router_interface(this.subnetDialog.form).then(response => {
+              this.msgSuccess("设置内网成功");
+              this.subnetDialog.open = false;
+              this.getList();
+            });
+          }
+        }
+      });
+    },
+
+    /** 取消内网设置 */
+    subnetDialog_cancel() {
+      this.subnetDialog.open = false;
+      this.subnetDialog_reset();
     },
   }
 };

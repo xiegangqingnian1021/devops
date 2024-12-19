@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.system.mapper.OpenstackRouterInterfaceMapper">
+    
+    <resultMap type="OpenstackRouterInterface" id="OpenstackRouterInterfaceResult">
+        <result property="id"    column="id"    />
+        <result property="routerId"    column="router_id"    />
+        <result property="isGateway"    column="is_gateway"    />
+        <result property="netId"    column="net_id"    />
+    </resultMap>
+
+    <sql id="selectOpenstackRouterInterfaceVo">
+        select id, router_id, is_gateway, net_id from openstack_router_interface
+    </sql>
+
+    <select id="selectOpenstackRouterInterfaceList" parameterType="OpenstackRouterInterface" resultMap="OpenstackRouterInterfaceResult">
+        <include refid="selectOpenstackRouterInterfaceVo"/>
+        <where>  
+            <if test="routerId != null  and routerId != ''"> and router_id = #{routerId}</if>
+            <if test="isGateway != null "> and is_gateway = #{isGateway}</if>
+            <if test="netId != null  and netId != ''"> and net_id = #{netId}</if>
+        </where>
+    </select>
+    
+    <select id="selectOpenstackRouterInterfaceById" parameterType="Long" resultMap="OpenstackRouterInterfaceResult">
+        <include refid="selectOpenstackRouterInterfaceVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertOpenstackRouterInterface" parameterType="OpenstackRouterInterface" useGeneratedKeys="true" keyProperty="id">
+        insert into openstack_router_interface
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="routerId != null">router_id,</if>
+            <if test="isGateway != null">is_gateway,</if>
+            <if test="netId != null">net_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="routerId != null">#{routerId},</if>
+            <if test="isGateway != null">#{isGateway},</if>
+            <if test="netId != null">#{netId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOpenstackRouterInterface" parameterType="OpenstackRouterInterface">
+        update openstack_router_interface
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="routerId != null">router_id = #{routerId},</if>
+            <if test="isGateway != null">is_gateway = #{isGateway},</if>
+            <if test="netId != null">net_id = #{netId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteOpenstackRouterInterfaceById" parameterType="Long">
+        delete from openstack_router_interface where id = #{id}
+    </delete>
+
+    <delete id="deleteOpenstackRouterInterfaceByIds" parameterType="String">
+        delete from openstack_router_interface where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
